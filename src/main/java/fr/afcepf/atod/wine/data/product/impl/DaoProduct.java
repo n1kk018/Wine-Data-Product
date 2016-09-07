@@ -29,10 +29,10 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 	@Override
 	public Product findByName(String name) {
 		Product p;
-		p = getSf().getCurrentSession()
+		p = (Product)getSf().getCurrentSession()
 			.createQuery(REQFINDBYNAME)
 			.setParameter("name", name)
-			.;
+			.uniqueResult();
 		
 		return null;
 	}
