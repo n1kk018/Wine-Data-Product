@@ -34,9 +34,6 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 			.setParameter("name", name)
 			.uniqueResult();
 		
-		return null;
+		return p;
 	}
-	
-	
-
 }
