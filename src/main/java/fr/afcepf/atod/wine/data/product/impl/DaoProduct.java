@@ -7,9 +7,9 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import fr.afcepf.atod.vin.entity.Product;
 import fr.afcepf.atod.wine.data.impl.DaoGeneric;
 import fr.afcepf.atod.wine.data.product.api.IDaoProduct;
+import fr.afcepf.atod.wine.entity.Product;
 
 
 @Service

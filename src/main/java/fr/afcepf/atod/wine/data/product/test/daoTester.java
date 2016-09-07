@@ -4,8 +4,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import fr.afcepf.atod.vin.entity.Product;
 import fr.afcepf.atod.wine.data.product.api.IDaoProduct;
+import fr.afcepf.atod.wine.entity.Product;
 
 public class daoTester {
 	 private static Logger log = Logger.getLogger(daoTester.class);
