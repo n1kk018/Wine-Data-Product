@@ -1,5 +1,7 @@
 package fr.afcepf.atod.wine.data.product.test;
 
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -19,6 +21,10 @@ public class daoTester {
 			log.info(p1);
 			Product p2 = dao.findByName("Maquis Cabernet Sauvignon 2012");
 			log.info(p2);
+			List<Product> list= dao.findAllObj();
+			for (Product product : list) {
+				log.info(product);
+			}
 		} catch (Exception e) {
 			log.fatal(e);
 		}
