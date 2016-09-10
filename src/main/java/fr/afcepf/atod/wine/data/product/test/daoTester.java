@@ -15,7 +15,7 @@ public class daoTester {
 	public static void main(String[] args) {
 		try {
 			@SuppressWarnings("resource")
-			BeanFactory bf = new ClassPathXmlApplicationContext("classpath:springDataGestionVin.xml");
+			BeanFactory bf = new ClassPathXmlApplicationContext("classpath:springData.xml");
 			IDaoProduct dao = (IDaoProduct) bf.getBean(IDaoProduct.class);
 			Product p1 = dao.findObj(9);
 			log.info(p1);
