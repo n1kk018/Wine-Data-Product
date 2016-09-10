@@ -19,20 +19,25 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
      *                  Requetes HQL
      ****************************************************/
 
-    	private static final String REQFINDBYNAME = "SELECT p FROM Product p WHERE p.name= :name";
+    	private static final String REQFINDBYNAME = "SELECT p FROM Product p "
+                + "WHERE p.name = :name";
 
     /****************************************************.
      *                 Fin Requetes HQL
      ****************************************************/
 	
-	
+	/**
+         * 
+         * @param name
+         * @return 
+         */
 	@Override
 	public Product findByName(String name) {
-		Product p;
-		p = (Product)getSf().getCurrentSession()
+		Product p = null;
+		p = (Product)(getSf().getCurrentSession()
 			.createQuery(REQFINDBYNAME)
 			.setParameter("name", name)
-			.uniqueResult();
+			.uniqueResult());
 		
 		return p;
 	}
