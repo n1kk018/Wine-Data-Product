@@ -7,5 +7,4 @@ import fr.afcepf.atod.wine.entity.Product;
 public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
 	
 	Product findByName(String name);
-	
 }
