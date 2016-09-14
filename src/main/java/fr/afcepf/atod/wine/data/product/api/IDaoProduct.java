@@ -26,5 +26,5 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
          * @return
          * @throws WineException 
          */
-        List<Product> findExpensiveProducts(double min) throws WineException;
+      List<Product> findExpensiveProducts(double min) throws WineException;
 }

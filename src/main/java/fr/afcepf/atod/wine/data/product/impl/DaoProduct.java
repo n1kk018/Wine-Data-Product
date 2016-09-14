@@ -22,9 +22,9 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
             + "WHERE p.name = :name";
     private static final String REQEXPPROD = "SELECT p FROM "
             + "Product p WHERE p.price > :paramMin";
-    private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT"
-            + " p FROM Product p WHERE p.speEvent IS NOT NULL "
-            + "ORDER BY p.speEvent.endDate ASC";
+    private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT DISTINCT"
+            + " p FROM Product p LEFT JOIN FETCH p.productSuppliers WHERE p.speEvent IS NOT NULL"
+            + " ORDER BY p.speEvent.endDate ASC";
 
     /** ********************************************** 
      * Fin Requetes HQL
@@ -56,7 +56,8 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         }
         return p;
     }
-     @Override
+     @SuppressWarnings("unchecked")
+	@Override
     public List<Product> findExpensiveProducts(double min) throws WineException {
         List<Product> expensiveProds = null;
         if (min >= 0) {
