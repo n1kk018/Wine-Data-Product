@@ -19,7 +19,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                 + "WHERE p.name = :name";
     	private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT"
     			+ " p FROM Product p WHERE p.speEvent IS NOT NULL "
-    			+ "ORDER BY p.speEvent.endDate ASC";
+    			+ "ORDER BY p.speEvent.endDate ASC";//AND SUM(p.productSuppliers.quantity)>0S
 
     /****************************************************.
      *                 Fin Requetes HQL
