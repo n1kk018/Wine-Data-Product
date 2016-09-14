@@ -17,11 +17,12 @@ public class daoTester {
 			@SuppressWarnings("resource")
 			BeanFactory bf = new ClassPathXmlApplicationContext("classpath:springData.xml");
 			IDaoProduct dao = (IDaoProduct) bf.getBean(IDaoProduct.class);
-			Product p1 = dao.findObj(9);
+			/*Product p1 = dao.findObj(9);
 			log.info(p1);
 			Product p2 = dao.findByName("Maquis Cabernet Sauvignon 2012");
-			log.info(p2);
-			List<Product> list= dao.findAllObj();
+			log.info(p2);*/
+			//List<Product> list= dao.findAllObj();
+			List<Product> list = dao.getPromotedProductsSortedByEndDate(10);
 			for (Product product : list) {
 				log.info(product);
 			}

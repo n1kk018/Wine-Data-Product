@@ -9,6 +9,12 @@ import java.util.List;
 public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
 	/**
          * 
+         * @param max
+         * @return 
+         */
+	List<Product> getPromotedProductsSortedByEndDate(Integer max);
+	/**
+         * 
          * @param name
          * @return
          * @throws WineException 
