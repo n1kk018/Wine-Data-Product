@@ -7,6 +7,7 @@ import fr.afcepf.atod.wine.data.api.IDaoGeneric;
 import fr.afcepf.atod.wine.entity.Product;
 import fr.afcepf.atod.wine.entity.ProductType;
 import fr.afcepf.atod.wine.entity.ProductVarietal;
+
 import fr.afcepf.atod.wine.entity.ProductVintage;
 
 public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
@@ -25,13 +26,18 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
 	 */
 	Product findByName(String name) throws WineException;
 
-	/**
-	 * 
-	 * @param min
-	 * @return
-	 * @throws WineException
-	 */
-	List<Product> findExpensiveProducts(double min) throws WineException;
+        /**
+         * 
+         * @param min
+         * @return
+         * @throws WineException 
+         */
+	  List<Product> findExpensiveProducts(double min) throws WineException;
+	 
+	  List<String> getAppellationsByWineType(ProductType type) throws WineException;
+	  
+	  List<ProductVarietal> getVarietalsByWineType(ProductType type) throws WineException;
+
 
 	List<Product> findByNotCompleteName(String name) throws WineException;
 
@@ -43,7 +49,4 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
 	
 	List<ProductType> findByType(String wineType) throws WineException;
 
-     
-      List<String> getAppellationsByWineType(ProductType type) throws WineException;
-      
 }

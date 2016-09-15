@@ -14,6 +14,7 @@ import fr.afcepf.atod.wine.entity.ProductType;
 import fr.afcepf.atod.wine.entity.ProductVarietal;
 import fr.afcepf.atod.wine.entity.ProductVintage;
 
+
 public class daoTester {
 	private static Logger log = Logger.getLogger(daoTester.class);
 
@@ -22,6 +23,19 @@ public class daoTester {
 			@SuppressWarnings("resource")
 			BeanFactory bf = new ClassPathXmlApplicationContext("classpath:springData.xml");
 			IDaoProduct dao = (IDaoProduct) bf.getBean(IDaoProduct.class);
+
+			IDaoProductType daoType = (IDaoProductType) bf.getBean(IDaoProductType.class);
+			/*Product p1 = dao.findObj(9);
+			log.info(p1);
+			Product p2 = dao.findByName("Maquis Cabernet Sauvignon 2012");
+			log.info(p2);*/
+			//List<Product> list= dao.findAllObj();
+			ProductType pt = daoType.findObj(1);
+			List<ProductVarietal> list = dao.getVarietalsByWineType(pt);
+			log.info(list);
+			for (ProductVarietal product : list) {
+				log.info(product.getDescription());
+			}
 			/*
 			 * Product p1 = dao.findObj(9); log.info(p1); Product p2 =
 			 * dao.findByName("Maquis Cabernet Sauvignon 2012"); log.info(p2);
@@ -37,14 +51,14 @@ public class daoTester {
 			// List<Product> list=dao.findByNotCompleteName("Jean");
 			// List<Product> list=dao.findByAppelation("Chablis");
 			// List<ProductVintage> list=dao.findByVintage(2002);
-			 List<ProductVarietal> list = dao.findByVariatal("Gamay");
+			 List<ProductVarietal> List = dao.findByVariatal("Gamay");
 //			List<ProductType> list = dao.findByType("Red Wines");
-			for (ProductVarietal product : list) {
-				for (Product p : product.getProductsWine()) {
+			for (ProductVarietal Product : List) {
+				for (Product p : Product.getProductsWine()) {
 					log.info("££££££££$$$$$$$$$$$$$$$$$" + p.getIdProduct() + " $$" + p.getName() + "%%%%%%%%%%");
 				}
-
 			}
+			
 		} catch (Exception e) {
 			log.fatal(e);
 		}

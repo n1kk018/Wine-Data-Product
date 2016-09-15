@@ -33,6 +33,9 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
             + " AND  p.speEvent IS NOT NULL";
     private static final String REQAPPELLATIONSBYWINETYPE = "SELECT DISTINCT p.appellation "
     		+ "FROM Product p WHERE p.productType = :type";
+    private static final String REQVARIETALSBYWINETYPE = "SELECT  p "
+    		+ "FROM Product p LEFT JOIN FETCH p.productVarietal "
+    		+ "RIGHT JOIN p.productType WHERE p.productType = :type";
             
 	private static final String REQFINDBYAPPELATION = "SELECT p FROM Product p WHERE p.appellation like :paramApp";
 	private static final String REQFINDBYTYPE = "SELECT distinct(pt) FROM ProductType pt left join fetch pt.productsWine where pt.type like :paramType";
@@ -80,6 +83,18 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 		}
 
 		return expensiveProds;
+	}
+
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<ProductVarietal> getVarietalsByWineType(ProductType type) throws WineException {
+		List<ProductVarietal> l = null;
+        l = getSf().getCurrentSession()
+                .createQuery(REQVARIETALSBYWINETYPE)
+                .setParameter("type", type)
+                .list();
+        return l;
 	}
 
 	/**
@@ -187,5 +202,4 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 	                .list();
 	        return l;
 		}
-
 }
