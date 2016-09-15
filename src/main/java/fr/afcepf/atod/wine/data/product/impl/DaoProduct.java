@@ -102,6 +102,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 		List<String> l = null;
         l = getSf().getCurrentSession()
                 .createQuery(REQAPPELLATIONSBYWINETYPE)
+                .setParameter("type", type)
                 .list();
         return l;
 	}
