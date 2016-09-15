@@ -42,4 +42,7 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
 	List<ProductVarietal> findByVariatal(String variatal) throws WineException;
 	
 	List<ProductType> findByType(String wineType) throws WineException;
+
+     
+      List<String> getAppellationsByWineType(ProductType type) throws WineException;
 }

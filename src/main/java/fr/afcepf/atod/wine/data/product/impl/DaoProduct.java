@@ -19,28 +19,28 @@ import fr.afcepf.atod.wine.entity.ProductVintage;
 @Transactional
 public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProduct {
 
-	/**
-	 * **************************************************** Requetes HQL
-	 ***************************************************/
-	private static final String REQFINDBYNAME = "SELECT p FROM Product p " + "WHERE p.name like :name";
-	private static final String REQEXPPROD = "SELECT p FROM " + "Product p WHERE p.price > :paramMin";
-	private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT"
-			+ " p FROM Product p LEFT JOIN FETCH p.productSuppliers WHERE 0 < ANY"
-			+ "(SELECT ps.quantity from ProductSupplier ps WHERE ps.pk.product=p)" + " AND  p.speEvent IS NOT NULL";
+    /**
+     * ****************************************************
+     * Requetes HQL 
+     ***************************************************/
+    private static final String REQFINDBYNAME = "SELECT p FROM Product p "
+            + "WHERE p.name = :name";
+    private static final String REQEXPPROD = "SELECT p FROM "
+            + "Product p WHERE p.price > :paramMin";
+    private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT"
+            + " p FROM Product p LEFT JOIN FETCH p.productSuppliers WHERE 0 < ANY"
+            + "(SELECT ps.quantity from ProductSupplier ps WHERE ps.pk.product=p)"
+            + " AND  p.speEvent IS NOT NULL";
+    private static final String REQAPPELLATIONSBYWINETYPE = "SELECT DISTINCT p.appellation "
+    		+ "FROM Product p WHERE p.productType = :type";
+            
 	private static final String REQFINDBYAPPELATION = "SELECT p FROM Product p WHERE p.appellation like :paramApp";
 	private static final String REQFINDBYTYPE = "SELECT distinct(pt) FROM ProductType pt left join fetch pt.productsWine where pt.type like :paramType";
 	private static final String REQFINDBYVINTAGE = "SELECT distinct(pv) FROM ProductVintage pv left join fetch pv.productsWine"
 			+ "  where pv.year =:paramVintage";
 
-//	private static final String REQFINDBYVARIETAL = "SELECT distinct(pv) FROM ProductVarietal pv left join fetch pv.productsWine"
-//			+ "  where pv.description like :paramVarietal";
-
-	
 	private static final String REQFINDBYVARIETAL = "SELECT distinct(p) FROM ProductWine p right join fetch p.productsWine"
 			+ "  where pv.description like :paramVarietal";
-	/**
-	 * ********************************************** Fin Requetes HQL
-	 *************************************************/
 
 	/**
 	 *
@@ -94,6 +94,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 		return l;
 
 	}
+
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -176,4 +177,16 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
 		return list;
 	}
+		@SuppressWarnings("unchecked")
+		@Override
+		public List<String> getAppellationsByWineType(ProductType type) throws WineException {
+			List<String> l = null;
+	        l = getSf().getCurrentSession()
+	                .createQuery(REQAPPELLATIONSBYWINETYPE)
+	                .setParameter("type", type)
+	                .list();
+	        return l;
+		}
+
+
 }
