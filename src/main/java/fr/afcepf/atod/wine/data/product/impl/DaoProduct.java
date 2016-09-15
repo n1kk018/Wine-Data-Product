@@ -28,6 +28,8 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
             + " p FROM Product p LEFT JOIN FETCH p.productSuppliers WHERE 0 < ANY"
             + "(SELECT ps.quantity from ProductSupplier ps WHERE ps.pk.product=p)"
             + " AND  p.speEvent IS NOT NULL";
+    private static final String REQAPPELLATIONSBYWINETYPE = "SELECT DISTINCT p.appellation "
+    		+ "FROM Product p WHERE p.productType = :type";
             
 
     /** ********************************************** 
@@ -94,4 +96,13 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                 .list();
         return l;
     }
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<String> getAppellationsByWineType(ProductType type) throws WineException {
+		List<String> l = null;
+        l = getSf().getCurrentSession()
+                .createQuery(REQAPPELLATIONSBYWINETYPE)
+                .list();
+        return l;
+	}
 }
