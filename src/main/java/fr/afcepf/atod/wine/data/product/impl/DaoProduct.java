@@ -9,6 +9,7 @@ import fr.afcepf.atod.wine.data.impl.DaoGeneric;
 import fr.afcepf.atod.wine.data.product.api.IDaoProduct;
 import fr.afcepf.atod.wine.entity.Product;
 import fr.afcepf.atod.wine.entity.ProductType;
+import fr.afcepf.atod.wine.entity.ProductVarietal;
 
 import java.util.List;
 
@@ -30,6 +31,9 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
             + " AND  p.speEvent IS NOT NULL";
     private static final String REQAPPELLATIONSBYWINETYPE = "SELECT DISTINCT p.appellation "
     		+ "FROM Product p WHERE p.productType = :type";
+    private static final String REQVARIETALSBYWINETYPE = "SELECT  p "
+    		+ "FROM Product p LEFT JOIN FETCH p.productVarietal "
+    		+ "RIGHT JOIN p.productType WHERE p.productType = :type";
             
 
     /** ********************************************** 
@@ -102,6 +106,17 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 		List<String> l = null;
         l = getSf().getCurrentSession()
                 .createQuery(REQAPPELLATIONSBYWINETYPE)
+                .setParameter("type", type)
+                .list();
+        return l;
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<ProductVarietal> getVarietalsByWineType(ProductType type) throws WineException {
+		List<ProductVarietal> l = null;
+        l = getSf().getCurrentSession()
+                .createQuery(REQVARIETALSBYWINETYPE)
                 .setParameter("type", type)
                 .list();
         return l;

@@ -10,6 +10,7 @@ import fr.afcepf.atod.wine.data.product.api.IDaoProduct;
 import fr.afcepf.atod.wine.data.product.api.IDaoProductType;
 import fr.afcepf.atod.wine.entity.Product;
 import fr.afcepf.atod.wine.entity.ProductType;
+import fr.afcepf.atod.wine.entity.ProductVarietal;
 
 public class daoTester {
 	 private static Logger log = Logger.getLogger(daoTester.class);
@@ -26,9 +27,10 @@ public class daoTester {
 			log.info(p2);*/
 			//List<Product> list= dao.findAllObj();
 			ProductType pt = daoType.findObj(1);
-			List<String> list = dao.getAppellationsByWineType(pt);
-			for (String product : list) {
-				log.info(product);
+			List<ProductVarietal> list = dao.getVarietalsByWineType(pt);
+			log.info(list);
+			for (ProductVarietal product : list) {
+				log.info(product.getDescription());
 			}
 		} catch (Exception e) {
 			log.fatal(e);
