@@ -24,7 +24,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
      * Requetes HQL 
      ***************************************************/
     private static final String REQFINDBYNAME = "SELECT p FROM Product p "
-            + "WHERE p.name = :name";
+            + "WHERE p.name like :name";
     private static final String REQEXPPROD = "SELECT p FROM "
             + "Product p WHERE p.price > :paramMin";
     private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT"
@@ -39,8 +39,8 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 	private static final String REQFINDBYVINTAGE = "SELECT distinct(pv) FROM ProductVintage pv left join fetch pv.productsWine"
 			+ "  where pv.year =:paramVintage";
 
-	private static final String REQFINDBYVARIETAL = "SELECT distinct(p) FROM ProductWine p right join fetch p.productsWine"
-			+ "  where pv.description like :paramVarietal";
+	private static final String REQFINDBYVARIETAL = "SELECT distinct(pv) FROM ProductVarietal pv left join fetch pv.productsWine pw"
+			+ "  where pw.description like :paramVarietal";
 
 	/**
 	 *
@@ -187,6 +187,5 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 	                .list();
 	        return l;
 		}
-
 
 }

@@ -45,4 +45,5 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
 
      
       List<String> getAppellationsByWineType(ProductType type) throws WineException;
+      
 }

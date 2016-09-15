@@ -37,9 +37,9 @@ public class daoTester {
 			// List<Product> list=dao.findByNotCompleteName("Jean");
 			// List<Product> list=dao.findByAppelation("Chablis");
 			// List<ProductVintage> list=dao.findByVintage(2002);
-			// List<ProductVarietal> list = dao.findByVariatal("Gamay");
-			List<ProductType> list = dao.findByType("Red Wines");
-			for (ProductType product : list) {
+			 List<ProductVarietal> list = dao.findByVariatal("Gamay");
+//			List<ProductType> list = dao.findByType("Red Wines");
+			for (ProductVarietal product : list) {
 				for (Product p : product.getProductsWine()) {
 					log.info("££££££££$$$$$$$$$$$$$$$$$" + p.getIdProduct() + " $$" + p.getName() + "%%%%%%%%%%");
 				}
