@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import fr.afcepf.atod.wine.data.impl.DaoGeneric;
 import fr.afcepf.atod.wine.data.product.api.IDaoProduct;
 import fr.afcepf.atod.wine.entity.Product;
+import fr.afcepf.atod.wine.entity.ProductType;
+
 import java.util.List;
 
 @Service
@@ -22,9 +24,11 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
             + "WHERE p.name = :name";
     private static final String REQEXPPROD = "SELECT p FROM "
             + "Product p WHERE p.price > :paramMin";
-    private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT DISTINCT"
-            + " p FROM Product p LEFT JOIN FETCH p.productSuppliers WHERE p.speEvent IS NOT NULL"
-            + " ORDER BY p.speEvent.endDate ASC";
+    private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT"
+            + " p FROM Product p LEFT JOIN FETCH p.productSuppliers WHERE 0 < ANY"
+            + "(SELECT ps.quantity from ProductSupplier ps WHERE ps.pk.product=p)"
+            + " AND  p.speEvent IS NOT NULL";
+            
 
     /** ********************************************** 
      * Fin Requetes HQL
