@@ -19,35 +19,41 @@ import fr.afcepf.atod.wine.entity.ProductVintage;
 @Transactional
 public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProduct {
 
-    /**********************************************
-     *              Requetes HQL 
-     **********************************************/
-    private static final String REQFINDBYNAME = "SELECT p FROM Product p "
-            + "WHERE p.name like :name";
-    private static final String REQEXPPROD = "SELECT p FROM "
-            + "Product p WHERE p.price > :paramMin";
+    /**
+     * ****************************************************
+     * Requetes HQL ***********************************************
+     */
+    private static final String REQFINDBYNAME = "SELECT p FROM Product p " + "WHERE p.name like :name";
+    private static final String REQEXPPROD = "SELECT p FROM " + "Product p WHERE p.price > :paramMin";
     private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT"
             + " p FROM Product p LEFT JOIN FETCH p.productSuppliers WHERE 0 < ANY"
-            + "(SELECT ps.quantity from ProductSupplier ps WHERE ps.pk.product=p)"
-            + " AND  p.speEvent IS NOT NULL";
+            + "(SELECT ps.quantity from ProductSupplier ps WHERE ps.pk.product=p)" + " AND  p.speEvent IS NOT NULL";
     private static final String REQAPPELLATIONSBYWINETYPE = "SELECT DISTINCT p.appellation "
             + "FROM Product p WHERE p.productType = :type";
     private static final String REQVARIETALSBYWINETYPE = "SELECT  DISTINCT(pv) "
-            + "FROM ProductVarietal pv LEFT JOIN pv.productsWine pw "
-            + "LEFT JOIN pw.productType pt WHERE pt = :type";
+            + "FROM ProductVarietal pv LEFT JOIN pv.productsWine pw " + "LEFT JOIN pw.productType pt WHERE pt = :type";
 
     private static final String REQFINDBYAPPELATION = "SELECT p FROM Product p WHERE p.appellation like :paramApp";
-    private static final String REQFINDBYTYPE = "SELECT distinct(pt) FROM ProductType pt left join fetch "
-            + "     pt.productsWine where pt.type like :paramType";
+    private static final String REQFINDBYTYPE = "SELECT distinct(pt) FROM ProductType pt left join fetch pt.productsWine where pt.type like :paramType";
     private static final String REQFINDBYVINTAGE = "SELECT distinct(pv) FROM ProductVintage pv left join fetch pv.productsWine"
             + "  where pv.year =:paramVintage";
 
     private static final String REQFINDBYVARIETAL = "SELECT distinct(pv) FROM ProductVarietal pv left join fetch pv.productsWine pw"
             + "  where pw.description like :paramVarietal";
 
-    /****************************************
-     *          Fin de requetes HQL 
-     ****************************************/
+    private static final String REQTYPEVARITAL = "SELECT distinct(p) FROM ProductWine p"
+            + " right join fetch productType  "
+            + "right join fetch productVarietal  WHERE "
+            + "p.productType like : paramPT AND p.productVarietal like :paramPV";
+//	from Cat as cat
+//    inner join fetch cat.mate
+//    left join fetch cat.kittens child
+//    left join fetch child.kittens
+
+    /**
+     * ********************************************
+     * Requetes HQL ********************************************
+     */
     /**
      *
      * @param name
@@ -69,6 +75,18 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     "the product named " + name + " has not been" + " found in the database.");
         }
         return p;
+    }
+
+    /**
+     *
+     *
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Product> getPromotedProductsSortedByEndDate(Integer max) {
+        List<Product> l = null;
+        l = getSf().getCurrentSession().createQuery(REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE).setMaxResults(max).list();
+        return l;
     }
 
     @SuppressWarnings("unchecked")
@@ -98,20 +116,103 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                 .list();
         return l;
     }
-
     /**
-     *
-     *
+     * 
+     * @param appelation
+     * @return
+     * @throws WineException 
+     */
+    @SuppressWarnings({"unchecked"})
+    @Override
+    public List<Product> findByAppelation(String appelation) throws WineException {
+        List<Product> list = null;
+        if (!appelation.equals("")) {
+            list = getSf().getCurrentSession().createQuery(REQFINDBYAPPELATION)
+                    .setParameter("paramApp", "%" + appelation + "%").list();
+            if (list == null) {
+                throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                        "the product list named " + list + " has not been"
+                        + " found in the database.");
+            }
+        } else {
+            throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                    "the product list named " + list + " has not been"
+                    + " found in the database.");
+        }
+        return list;
+    }
+    /**
+     * 
+     * @param vintage
+     * @return
+     * @throws WineException 
      */
     @SuppressWarnings("unchecked")
     @Override
-    public List<Product> getPromotedProductsSortedByEndDate(Integer max) {
-        List<Product> l = null;
-        l = getSf().getCurrentSession().createQuery(REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE).setMaxResults(max).list();
-        return l;
+    public List<ProductVintage> findByVintage(Integer vintage) throws WineException {
+        List<ProductVintage> list = null;
+        list = getSf().getCurrentSession().createQuery(REQFINDBYVINTAGE).setParameter("paramVintage", vintage).list();
+        return list;
+    }
+    /**
+     * 
+     * @param variatal
+     * @return
+     * @throws WineException 
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<ProductVarietal> findByVariatal(String variatal) throws WineException {
+        List<ProductVarietal> list = null;
+        if (!variatal.equals("")) {
+            list = getSf().getCurrentSession().createQuery(REQFINDBYVARIETAL)
+                    .setParameter("paramVarietal", "%" + variatal + "%").list();
+            if (list == null) {
+                throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                        "the productVarietal list named " + list + " has not been"
+                        + " found in the database.");
+            }
+        } else {
+            throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                    "the productVarietal list named " + list + " has not been"
+                    + " found in the database.");
+        }
+
+        return list;
 
     }
+    /**
+     * 
+     * @param wineType
+     * @return
+     * @throws WineException 
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<ProductType> findByType(String wineType) throws WineException {
+        List<ProductType> list = null;
+        if (!wineType.equals("")) {
+            list = getSf().getCurrentSession().createQuery(REQFINDBYTYPE)
+                    .setParameter("paramType", "%" + wineType + "%").list();
+            if (list == null) {
+                throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                        "the productVarietal list named " + list + " has not been"
+                        + " found in the database.");
+            }
+        } else {
+            throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                    "the productVarietal list named " + list + " has not been"
+                    + " found in the database.");
+        }
 
+        return list;
+    }
+    /**
+     * 
+     * @param name
+     * @return
+     * @throws WineException 
+     */
     @SuppressWarnings("unchecked")
     @Override
     public List<Product> findByNotCompleteName(String name) throws WineException {
@@ -128,86 +229,33 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         }
         return list;
     }
-
-    @SuppressWarnings({"unchecked"})
+    /**
+     * 
+     * @param wineType
+     * @param varietal
+     * @return
+     * @throws WineException 
+     */
+    @SuppressWarnings("unchecked")
     @Override
-    public List<Product> findByAppelation(String appelation) throws WineException {
+    public List<Product> findByVarietalAndType(String wineType, String varietal) throws WineException {
         List<Product> list = null;
-        if (!appelation.equals("")) {
-            list = getSf().getCurrentSession().createQuery(REQFINDBYAPPELATION)
-                    .setParameter("paramApp", "%" + appelation + "%").list();
-            if (list == null) {
-                throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
-                        "the product list named " + list + " has not been"
-                                + " found in the database.");
-            }
-        } else {
-            throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
-                    "the product list named " + list + " has not been"
-                                + " found in the database.");
-        }
+        list = getSf().getCurrentSession().createQuery(REQTYPEVARITAL).
+                setParameter("paramPT", "%" + wineType + "%").setParameter("paramPV", varietal).list();
         return list;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<ProductVintage> findByVintage(Integer vintage) throws WineException {
-        List<ProductVintage> list = null;
-        list = getSf().getCurrentSession().createQuery(REQFINDBYVINTAGE).setParameter("paramVintage", vintage).list();
-        return list;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<ProductVarietal> findByVariatal(String variatal) throws WineException {
-        List<ProductVarietal> list = null;
-        if (!variatal.equals("")) {
-            list = getSf().getCurrentSession().createQuery(REQFINDBYVARIETAL)
-                    .setParameter("paramVarietal", "%" + variatal + "%").list();
-            if (list == null) {
-                throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
-                        "the productVarietal list named " + list + " has not been" 
-                                + " found in the database.");
-            }
-        } else {
-            throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
-                    "the productVarietal list named " + list + " has not been"
-                            + " found in the database.");
-        }
-
-        return list;
-
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<ProductType> findByType(String wineType) throws WineException {
-        List<ProductType> list = null;
-        if (!wineType.equals("")) {
-            list = getSf().getCurrentSession().createQuery(REQFINDBYTYPE)
-                    .setParameter("paramType", "%" + wineType + "%").list();
-            if (list == null) {
-                throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
-                        "the productVarietal list named " + list + " has not been" + 
-                                " found in the database.");
-            }
-        } else {
-            throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
-                    "the productVarietal list named " + list + " has not been" + 
-                            " found in the database.");
-        }
-
-        return list;
-    }
-
+    /**
+     * 
+     * @param type
+     * @return
+     * @throws WineException 
+     */
     @SuppressWarnings("unchecked")
     @Override
     public List<String> getAppellationsByWineType(ProductType type) throws WineException {
         List<String> l = null;
-        l = getSf().getCurrentSession()
-                .createQuery(REQAPPELLATIONSBYWINETYPE)
-                .setParameter("type", type)
-                .list();
+        l = getSf().getCurrentSession().createQuery(REQAPPELLATIONSBYWINETYPE).setParameter("type", type).list();
         return l;
     }
 }
