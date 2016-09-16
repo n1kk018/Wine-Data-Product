@@ -19,24 +19,19 @@ import fr.afcepf.atod.wine.entity.ProductVintage;
 @Transactional
 public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProduct {
 
-    /**
-     * ****************************************************
-     * Requetes HQL 
-     ***************************************************/
-    private static final String REQFINDBYNAME = "SELECT p FROM Product p "
-            + "WHERE p.name like :name";
-    private static final String REQEXPPROD = "SELECT p FROM "
-            + "Product p WHERE p.price > :paramMin";
-    private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT"
-            + " p FROM Product p LEFT JOIN FETCH p.productSuppliers WHERE 0 < ANY"
-            + "(SELECT ps.quantity from ProductSupplier ps WHERE ps.pk.product=p)"
-            + " AND  p.speEvent IS NOT NULL";
-    private static final String REQAPPELLATIONSBYWINETYPE = "SELECT DISTINCT p.appellation "
-    		+ "FROM Product p WHERE p.productType = :type";
-    private static final String REQVARIETALSBYWINETYPE = "SELECT  DISTINCT(pv) "
-    		+ "FROM ProductVarietal pv LEFT JOIN pv.productsWine pw "
-    		+ "LEFT JOIN pw.productType pt WHERE pt = :type";
-            
+	/**
+	 * **************************************************** Requetes HQL
+	 ***************************************************/
+	private static final String REQFINDBYNAME = "SELECT p FROM Product p " + "WHERE p.name like :name";
+	private static final String REQEXPPROD = "SELECT p FROM " + "Product p WHERE p.price > :paramMin";
+	private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT"
+			+ " p FROM Product p LEFT JOIN FETCH p.productSuppliers WHERE 0 < ANY"
+			+ "(SELECT ps.quantity from ProductSupplier ps WHERE ps.pk.product=p)" + " AND  p.speEvent IS NOT NULL";
+	private static final String REQAPPELLATIONSBYWINETYPE = "SELECT DISTINCT p.appellation "
+			+ "FROM Product p WHERE p.productType = :type";
+	private static final String REQVARIETALSBYWINETYPE = "SELECT  DISTINCT(pv) "
+			+ "FROM ProductVarietal pv LEFT JOIN pv.productsWine pw " + "LEFT JOIN pw.productType pt WHERE pt = :type";
+
 	private static final String REQFINDBYAPPELATION = "SELECT p FROM Product p WHERE p.appellation like :paramApp";
 	private static final String REQFINDBYTYPE = "SELECT distinct(pt) FROM ProductType pt left join fetch pt.productsWine where pt.type like :paramType";
 	private static final String REQFINDBYVINTAGE = "SELECT distinct(pv) FROM ProductVintage pv left join fetch pv.productsWine"
@@ -44,7 +39,19 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
 	private static final String REQFINDBYVARIETAL = "SELECT distinct(pv) FROM ProductVarietal pv left join fetch pv.productsWine pw"
 			+ "  where pw.description like :paramVarietal";
-
+	
+	
+	private static final String REQTYPEVARITAL ="SELECT distinct(p) FROM ProductWine p"
+			+ " right join fetch productType  "
+			+ "right join fetch productVarietal  WHERE "
+			+ "p.productType like : paramPT AND p.productVarietal like :paramPV";
+	
+	
+//	from Cat as cat
+//    inner join fetch cat.mate
+//    left join fetch cat.kittens child
+//    left join fetch child.kittens
+    
 	/**
 	 *
 	 * @param name
@@ -85,16 +92,12 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 		return expensiveProds;
 	}
 
-	
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<ProductVarietal> getVarietalsByWineType(ProductType type) throws WineException {
 		List<ProductVarietal> l = null;
-        l = getSf().getCurrentSession()
-                .createQuery(REQVARIETALSBYWINETYPE)
-                .setParameter("type", type)
-                .list();
-        return l;
+		l = getSf().getCurrentSession().createQuery(REQVARIETALSBYWINETYPE).setParameter("type", type).list();
+		return l;
 	}
 
 	/**
@@ -109,7 +112,6 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 		return l;
 
 	}
-
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -192,14 +194,21 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
 		return list;
 	}
-		@SuppressWarnings("unchecked")
-		@Override
-		public List<String> getAppellationsByWineType(ProductType type) throws WineException {
-			List<String> l = null;
-	        l = getSf().getCurrentSession()
-	                .createQuery(REQAPPELLATIONSBYWINETYPE)
-	                .setParameter("type", type)
-	                .list();
-	        return l;
-		}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<String> getAppellationsByWineType(ProductType type) throws WineException {
+		List<String> l = null;
+		l = getSf().getCurrentSession().createQuery(REQAPPELLATIONSBYWINETYPE).setParameter("type", type).list();
+		return l;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Product> findByVarietalAndType(String wineType, String varietal) throws WineException {
+		List<Product> list = null;
+		list = getSf().getCurrentSession().createQuery(REQTYPEVARITAL).
+				setParameter("paramPT", "%" + wineType + "%").setParameter("paramPV", varietal).list();
+		return list;
+	}
 }
