@@ -14,6 +14,7 @@ import fr.afcepf.atod.wine.entity.City;
 import fr.afcepf.atod.wine.entity.Product;
 import fr.afcepf.atod.wine.entity.ProductType;
 import fr.afcepf.atod.wine.entity.ProductVarietal;
+import fr.afcepf.atod.wine.entity.ProductWine;
 
 
 public class daoTester {
@@ -26,12 +27,8 @@ public class daoTester {
 			IDaoProduct dao = (IDaoProduct) bf.getBean(IDaoProduct.class);
 			fr.afcepf.atod.wine.data.product.api.IDaoCity daoC=(IDaoCity) bf.getBean(IDaoCity.class);
 
-			List<Product> list =null;
-			list =dao.findByVarietalAndType("White Wines", "Rosé");
-			for (Product product : list) {
-				log.info("@@@@@@@@@@@@@@@ " + product.getName()+"@@@@@@@@à" +product.getPrice());
-			}
-//			List<City> lc =null;
+			List<ProductWine> list =null;
+			
 //			lc =daoC.findAllObj();
 //			for (City city : lc) {
 //				log.info("gtgtgtgt" + city.getName());

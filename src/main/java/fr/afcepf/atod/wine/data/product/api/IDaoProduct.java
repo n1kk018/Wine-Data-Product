@@ -9,6 +9,7 @@ import fr.afcepf.atod.wine.entity.ProductType;
 import fr.afcepf.atod.wine.entity.ProductVarietal;
 
 import fr.afcepf.atod.wine.entity.ProductVintage;
+import fr.afcepf.atod.wine.entity.ProductWine;
 
 public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
 
@@ -98,6 +99,8 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      * @throws WineException
      */
-    List<Product> findByVarietalAndType(String wineType, String Varietal) throws WineException;
-
+    List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal Varietal) 
+            throws WineException;
+    List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage)
+            throws WineException;
 }

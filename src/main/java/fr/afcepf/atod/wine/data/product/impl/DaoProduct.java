@@ -14,6 +14,7 @@ import fr.afcepf.atod.wine.entity.Product;
 import fr.afcepf.atod.wine.entity.ProductType;
 import fr.afcepf.atod.wine.entity.ProductVarietal;
 import fr.afcepf.atod.wine.entity.ProductVintage;
+import fr.afcepf.atod.wine.entity.ProductWine;
 
 @Service
 @Transactional
@@ -218,14 +219,17 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     public List<Product> findByNotCompleteName(String name) throws WineException {
         List<Product> list = null;
         if (!name.equals("")) {
-            list = getSf().getCurrentSession().createQuery(REQFINDBYNAME).setParameter("name", "%" + name + "%").list();
+            list = getSf().getCurrentSession().createQuery(REQFINDBYNAME)
+                    .setParameter("name", "%" + name + "%").list();
             if (list == null) {
                 throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
-                        "the product list named " + list + " has not been" + " found in the database.");
+                        "the product list named " + list + " has not been" 
+                                + " found in the database.");
             }
         } else {
             throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
-                    "the product list named " + list + " has not been" + " found in the database.");
+                    "the product list named " + list + " has not been" 
+                            + " found in the database.");
         }
         return list;
     }
@@ -238,10 +242,12 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
      */
     @SuppressWarnings("unchecked")
     @Override
-    public List<Product> findByVarietalAndType(String wineType, String varietal) throws WineException {
-        List<Product> list = null;
+    public List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal varietal) 
+            throws WineException {
+        List<ProductWine> list = null;
         list = getSf().getCurrentSession().createQuery(REQTYPEVARITAL).
-                setParameter("paramPT", "%" + wineType + "%").setParameter("paramPV", varietal).list();
+                setParameter("paramPT", "%" + wineType.getType() + "%")
+                .setParameter("paramPV", varietal.getDescription()).list();
         return list;
     }
 
@@ -258,4 +264,10 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         l = getSf().getCurrentSession().createQuery(REQAPPELLATIONSBYWINETYPE).setParameter("type", type).list();
         return l;
     }
+
+    @Override
+    public List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage) throws WineException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
 }
