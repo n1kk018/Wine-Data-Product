@@ -100,4 +100,21 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      */
     List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage)
             throws WineException;
+    /**
+     * 
+     * @param type
+     * @param integ
+     * @return
+     * @throws WineException 
+     */
+    List<ProductWine> findByMoneyAndType(ProductType type, int integ) throws WineException;
+    /**
+     * 
+     * @param type
+     * @param integ
+     * @param maxInt
+     * @return
+     * @throws WineException 
+     */
+    List<ProductWine> findByMoneyAndType(ProductType type, int integ, int maxInt) throws WineException;
 }

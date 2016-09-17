@@ -22,13 +22,12 @@ import java.util.Set;
 @Transactional
 public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProduct {
 
-    /**
-     * ****************************************************
-     * Requetes HQL ***********************************************
-     */
+    /*****************************************************
+     * Requetes HQL 
+     ****************************************************/
     private static final String REQFINDBYNAME = "SELECT p FROM Product p " + "WHERE p.name like :name";
 
-    private static final String REQEXPPROD = "SELECT p FROM " + "Product p WHERE p.price > :paramMin";
+    private static final String REQEXPPROD = "SELECT p FROM Product p WHERE p.price > :paramMin";
 
     private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT"
             + " p FROM Product p LEFT JOIN FETCH p.productSuppliers WHERE 0 < ANY"
@@ -57,15 +56,22 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     private static final String REQTYPEVARITAL = "SELECT distinct(pv) FROM ProductVarietal pv "
             + "left join fetch pv.productsWine as pw WHERE pv.description = :paramVarietal "
             + "AND pw.productType.type = :paramType";
-//	from Cat as cat
-//    inner join fetch cat.mate
-//    left join fetch cat.kittens child
-//    left join fetch child.kittens
 
-    /**
-     * ********************************************
-     * Requetes HQL ********************************************
-     */
+    private static final String REQTYPEVINTAGE = "SELECT distinct(pv) FROM ProductVintage pv "
+            + "left join fetch pv.productsWine as pw WHERE pv.year = :paramYear "
+            + "AND pw.productType.type = :paramType";
+    
+    private static final String REQTYPEMAXMONEY = "SELECT p FROM ProductWine p "
+            + "WHERE p.productType = :paramType AND p.price > :paramMin";
+    
+    private static final String REQTYPEMONEY = "SELECT p FROM ProductWine p "
+            + "WHERE p.productType = :paramType AND p.price between :start "
+            + " and :end";
+    
+
+    /*********************************************
+     * Requetes HQL
+     *********************************************/
     @Override
     public Product findByName(String name) throws WineException {
         Product p = null;
@@ -258,7 +264,65 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
     @Override
     public List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage) throws WineException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<ProductWine> listWine = null;
+        List<ProductVarietal> list = null;
+        if (!type.getType().equalsIgnoreCase("")
+                && vintage.getYear() != null) {
+            list = getSf().getCurrentSession().createQuery(REQTYPEVINTAGE)
+                    .setParameter("paramType", type.getType())
+                    .setParameter("paramVintage",vintage.getYear())
+                    .list();
+            if (!list.isEmpty()) {
+                listWine = new ArrayList(list.get(0).getProductsWine());
+            } else {
+                throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                    "the products according to the type "
+                    + type + " and " + vintage.getYear().toString()
+                    + " has not been"
+                    + " found in the database.");
+            }
+        } else {
+            throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                    "the products according to the type "
+                    + type + " and " + vintage.getYear().toString()
+                    + " has not been"
+                    + " found in the database.");
+        }
+        return listWine;
     }    
+
+    @Override
+    public List<ProductWine> findByMoneyAndType(ProductType type, int integ) throws WineException {
+        List<ProductWine> listWine = null;
+        if (!type.getType().equalsIgnoreCase("")) {
+            listWine = getSf().getCurrentSession()
+                    .createQuery(REQTYPEMAXMONEY)
+                    .setParameter("paramType", type.getType())
+                    .setParameter("paramMin", integ)
+                    .list();
+        } else {
+            throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                    "Pas de produit avec un prix aussi eleve.");
+        }
+        return listWine;
+    }
+
+    @Override
+    public List<ProductWine> findByMoneyAndType(ProductType type, int integ, int maxInt) throws WineException {
+         List<ProductWine> listWine = null;
+        if (!type.getType().equalsIgnoreCase("")) {
+            listWine = getSf().getCurrentSession()
+                    .createQuery(REQTYPEMAXMONEY)
+                    .setParameter("paramType", type.getType())
+                    .setParameter("start", integ)
+                    .setParameter("end", maxInt)
+                    .list();
+        } else {
+            throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                    "Pas de produit avec un prix aussi eleve.");
+        }
+        return listWine;
+        
+    }
 
 }
