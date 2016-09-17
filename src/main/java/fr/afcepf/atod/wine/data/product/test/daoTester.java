@@ -10,25 +10,38 @@ import fr.afcepf.atod.wine.data.product.api.IDaoCity;
 import fr.afcepf.atod.wine.data.product.api.IDaoProduct;
 import fr.afcepf.atod.wine.data.product.api.IDaoProductType;
 import fr.afcepf.atod.wine.data.product.impl.DaoCity;
+import fr.afcepf.atod.wine.data.product.impl.DaoProductType;
 import fr.afcepf.atod.wine.entity.City;
 import fr.afcepf.atod.wine.entity.Product;
 import fr.afcepf.atod.wine.entity.ProductType;
 import fr.afcepf.atod.wine.entity.ProductVarietal;
 import fr.afcepf.atod.wine.entity.ProductWine;
 
-
 public class daoTester {
-	private static Logger log = Logger.getLogger(daoTester.class);
 
-	public static void main(String[] args) {
-		try {
-			@SuppressWarnings("resource")
-			BeanFactory bf = new ClassPathXmlApplicationContext("classpath:springData.xml");
-			IDaoProduct dao = (IDaoProduct) bf.getBean(IDaoProduct.class);
-			fr.afcepf.atod.wine.data.product.api.IDaoCity daoC=(IDaoCity) bf.getBean(IDaoCity.class);
+    private static Logger log = Logger.getLogger(daoTester.class);
 
-			List<ProductWine> list =null;
-			
+    public static void main(String[] args) {
+        try {
+            @SuppressWarnings("resource")
+            BeanFactory bf = new ClassPathXmlApplicationContext("classpath:springData.xml");
+            IDaoProduct daoProduct = (IDaoProduct) bf.getBean(IDaoProduct.class);
+            fr.afcepf.atod.wine.data.product.api.IDaoCity daoC
+                    = (IDaoCity) bf.getBean(IDaoCity.class);
+            IDaoProductType daoProductType = (IDaoProductType) bf.getBean(IDaoProductType.class);
+            List<ProductWine> list = null;
+            List<ProductType> types = daoProductType.findAllObj();
+
+            for (ProductType productType : types) {   
+                List<ProductVarietal> varietals = daoProduct.getVarietalsByWineType(productType);
+                for (ProductVarietal varietal : varietals) {
+                     List<ProductWine> wines = daoProduct
+                        .findByVarietalAndType(productType,varietal);
+                     for (ProductWine wine : wines) {
+                         log.info("\t ##############");
+                     }
+                }
+            }
 //			lc =daoC.findAllObj();
 //			for (City city : lc) {
 //				log.info("gtgtgtgt" + city.getName());
@@ -67,10 +80,10 @@ public class daoTester {
 //					log.info("££££££££$$$$$$$$$$$$$$$$$" + p.getIdProduct() + " $$" + p.getName() + "%%%%%%%%%%");
 //				}
 //			}
-			
-		} catch (Exception e) {
-			log.fatal(e);
-		}
-	}
+
+        } catch (Exception e) {
+            log.fatal(e);
+        }
+    }
 
 }

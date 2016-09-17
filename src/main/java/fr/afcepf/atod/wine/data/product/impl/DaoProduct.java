@@ -15,6 +15,8 @@ import fr.afcepf.atod.wine.entity.ProductType;
 import fr.afcepf.atod.wine.entity.ProductVarietal;
 import fr.afcepf.atod.wine.entity.ProductVintage;
 import fr.afcepf.atod.wine.entity.ProductWine;
+import java.util.ArrayList;
+import java.util.Set;
 
 @Service
 @Transactional
@@ -25,27 +27,36 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
      * Requetes HQL ***********************************************
      */
     private static final String REQFINDBYNAME = "SELECT p FROM Product p " + "WHERE p.name like :name";
+
     private static final String REQEXPPROD = "SELECT p FROM " + "Product p WHERE p.price > :paramMin";
+
     private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT"
             + " p FROM Product p LEFT JOIN FETCH p.productSuppliers WHERE 0 < ANY"
             + "(SELECT ps.quantity from ProductSupplier ps WHERE ps.pk.product=p)" + " AND  p.speEvent IS NOT NULL";
+
     private static final String REQAPPELLATIONSBYWINETYPE = "SELECT DISTINCT p.appellation "
             + "FROM Product p WHERE p.productType = :type";
-    private static final String REQVARIETALSBYWINETYPE = "SELECT  DISTINCT(pv) "
-            + "FROM ProductVarietal pv LEFT JOIN pv.productsWine pw " + "LEFT JOIN pw.productType pt WHERE pt = :type";
 
-    private static final String REQFINDBYAPPELATION = "SELECT p FROM Product p WHERE p.appellation like :paramApp";
-    private static final String REQFINDBYTYPE = "SELECT distinct(pt) FROM ProductType pt left join fetch pt.productsWine where pt.type like :paramType";
-    private static final String REQFINDBYVINTAGE = "SELECT distinct(pv) FROM ProductVintage pv left join fetch pv.productsWine"
+    private static final String REQVARIETALSBYWINETYPE = "SELECT  DISTINCT(pv) "
+            + "FROM ProductVarietal pv LEFT JOIN pv.productsWine pw "
+            + "LEFT JOIN pw.productType pt WHERE pt = :type";
+
+    private static final String REQFINDBYAPPELATION = "SELECT p FROM Product "
+            + "p WHERE p.appellation like :paramApp";
+
+    private static final String REQFINDBYTYPE = "SELECT distinct(pt) FROM ProductType pt "
+            + "left join fetch pt.productsWine where pt.type like :paramType";
+    private static final String REQFINDBYVINTAGE = "SELECT distinct(pv) FROM ProductVintage pv "
+            + "left join fetch pv.productsWine"
             + "  where pv.year =:paramVintage";
 
-    private static final String REQFINDBYVARIETAL = "SELECT distinct(pv) FROM ProductVarietal pv left join fetch pv.productsWine pw"
+    private static final String REQFINDBYVARIETAL = "SELECT distinct(pv) FROM ProductVarietal pv "
+            + "left join fetch pv.productsWine pw"
             + "  where pw.description like :paramVarietal";
 
-    private static final String REQTYPEVARITAL = "SELECT distinct(p) FROM ProductWine p"
-            + " right join fetch productType  "
-            + "right join fetch productVarietal  WHERE "
-            + "p.productType like : paramPT AND p.productVarietal like :paramPV";
+    private static final String REQTYPEVARITAL = "SELECT distinct(pv) FROM ProductVarietal pv "
+            + "left join fetch pv.productsWine as pw WHERE pv.description = :paramVarietal "
+            + "AND pw.productType.type = :paramType";
 //	from Cat as cat
 //    inner join fetch cat.mate
 //    left join fetch cat.kittens child
@@ -54,12 +65,6 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     /**
      * ********************************************
      * Requetes HQL ********************************************
-     */
-    /**
-     *
-     * @param name
-     * @return
-     *
      */
     @Override
     public Product findByName(String name) throws WineException {
@@ -117,12 +122,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                 .list();
         return l;
     }
-    /**
-     * 
-     * @param appelation
-     * @return
-     * @throws WineException 
-     */
+
     @SuppressWarnings({"unchecked"})
     @Override
     public List<Product> findByAppelation(String appelation) throws WineException {
@@ -142,12 +142,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         }
         return list;
     }
-    /**
-     * 
-     * @param vintage
-     * @return
-     * @throws WineException 
-     */
+
     @SuppressWarnings("unchecked")
     @Override
     public List<ProductVintage> findByVintage(Integer vintage) throws WineException {
@@ -155,15 +150,10 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         list = getSf().getCurrentSession().createQuery(REQFINDBYVINTAGE).setParameter("paramVintage", vintage).list();
         return list;
     }
-    /**
-     * 
-     * @param variatal
-     * @return
-     * @throws WineException 
-     */
+
     @SuppressWarnings("unchecked")
     @Override
-    public List<ProductVarietal> findByVariatal(String variatal) throws WineException {
+    public List<ProductVarietal> findByVarietal(String variatal) throws WineException {
         List<ProductVarietal> list = null;
         if (!variatal.equals("")) {
             list = getSf().getCurrentSession().createQuery(REQFINDBYVARIETAL)
@@ -182,12 +172,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         return list;
 
     }
-    /**
-     * 
-     * @param wineType
-     * @return
-     * @throws WineException 
-     */
+
     @SuppressWarnings("unchecked")
     @Override
     public List<ProductType> findByType(String wineType) throws WineException {
@@ -208,12 +193,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
         return list;
     }
-    /**
-     * 
-     * @param name
-     * @return
-     * @throws WineException 
-     */
+
     @SuppressWarnings("unchecked")
     @Override
     public List<Product> findByNotCompleteName(String name) throws WineException {
@@ -223,51 +203,62 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     .setParameter("name", "%" + name + "%").list();
             if (list == null) {
                 throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
-                        "the product list named " + list + " has not been" 
-                                + " found in the database.");
+                        "the product list named " + list + " has not been"
+                        + " found in the database.");
             }
         } else {
             throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
-                    "the product list named " + list + " has not been" 
-                            + " found in the database.");
+                    "the product list named " + list + " has not been"
+                    + " found in the database.");
         }
         return list;
     }
-    /**
-     * 
-     * @param wineType
-     * @param varietal
-     * @return
-     * @throws WineException 
-     */
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal varietal) 
-            throws WineException {
-        List<ProductWine> list = null;
-        list = getSf().getCurrentSession().createQuery(REQTYPEVARITAL).
-                setParameter("paramPT", "%" + wineType.getType() + "%")
-                .setParameter("paramPV", varietal.getDescription()).list();
-        return list;
-    }
 
-    /**
-     * 
-     * @param type
-     * @return
-     * @throws WineException 
-     */
     @SuppressWarnings("unchecked")
     @Override
     public List<String> getAppellationsByWineType(ProductType type) throws WineException {
         List<String> l = null;
-        l = getSf().getCurrentSession().createQuery(REQAPPELLATIONSBYWINETYPE).setParameter("type", type).list();
+        l = getSf().getCurrentSession()
+                .createQuery(REQAPPELLATIONSBYWINETYPE)
+                .setParameter("type", type)
+                .list();
         return l;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal varietal)
+            throws WineException {
+        List<ProductWine> listWine = null;
+        List<ProductVarietal> list = null;
+        if (!wineType.getType().equalsIgnoreCase("")
+                && !varietal.getDescription().equalsIgnoreCase("")) {
+            list = getSf().getCurrentSession().createQuery(REQTYPEVARITAL)
+                    .setParameter("paramType", wineType.getType())
+                    .setParameter("paramVarietal", varietal.getDescription())
+                    .list();
+            if (!list.isEmpty()) {
+                listWine = new ArrayList(list.get(0).getProductsWine());
+            } else {
+                throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                    "the products according to the type "
+                    + wineType + " and " + varietal.getDescription()
+                    + " has not been"
+                    + " found in the database.");
+            }
+        } else {
+            throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                    "the products according to the type "
+                    + wineType + " and " + varietal.getDescription()
+                    + " has not been"
+                    + " found in the database.");
+        }
+        return listWine;
     }
 
     @Override
     public List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage) throws WineException {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-    
+    }    
+
 }

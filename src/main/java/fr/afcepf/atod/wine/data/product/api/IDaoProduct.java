@@ -19,7 +19,6 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      */
     List<Product> getPromotedProductsSortedByEndDate(Integer max);
-
     /**
      *
      * @param name
@@ -27,7 +26,6 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @throws WineException
      */
     Product findByName(String name) throws WineException;
-
     /**
      *
      * @param min
@@ -35,7 +33,6 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @throws WineException
      */
     List<Product> findExpensiveProducts(double min) throws WineException;
-
     /**
      *
      * @param type
@@ -43,7 +40,6 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @throws WineException
      */
     List<String> getAppellationsByWineType(ProductType type) throws WineException;
-
     /**
      *
      * @param type
@@ -51,7 +47,6 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @throws WineException
      */
     List<ProductVarietal> getVarietalsByWineType(ProductType type) throws WineException;
-
     /**
      *
      * @param name
@@ -59,7 +54,6 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @throws WineException
      */
     List<Product> findByNotCompleteName(String name) throws WineException;
-
     /**
      *
      * @param appelation
@@ -67,7 +61,6 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @throws WineException
      */
     List<Product> findByAppelation(String appelation) throws WineException;
-
     /**
      *
      * @param vintage
@@ -75,15 +68,13 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @throws WineException
      */
     List<ProductVintage> findByVintage(Integer vintage) throws WineException;
-
     /**
      *
      * @param variatal
      * @return
      * @throws WineException
      */
-    List<ProductVarietal> findByVariatal(String variatal) throws WineException;
-
+    List<ProductVarietal> findByVarietal(String variatal) throws WineException;
     /**
      *
      * @param wineType
@@ -91,7 +82,6 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @throws WineException
      */
     List<ProductType> findByType(String wineType) throws WineException;
-
     /**
      *
      * @param wineType
@@ -101,6 +91,13 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      */
     List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal Varietal) 
             throws WineException;
+    /**
+     * 
+     * @param type
+     * @param vintage
+     * @return
+     * @throws WineException 
+     */
     List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage)
             throws WineException;
 }
