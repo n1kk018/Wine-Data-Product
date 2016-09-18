@@ -58,14 +58,14 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
             + "AND pw.productType.type = :paramType";
 
     private static final String REQTYPEVINTAGE = "SELECT distinct(pv) FROM ProductVintage pv "
-            + "left join fetch pv.productsWine as pw WHERE pv.year = :paramYear "
+            + "left join fetch pv.productsWine as pw WHERE pv.year = :paramVintage "
             + "AND pw.productType.type = :paramType";
     
     private static final String REQTYPEMAXMONEY = "SELECT p FROM ProductWine p "
             + "WHERE p.productType = :paramType AND p.price > :paramMin";
     
     private static final String REQTYPEMONEY = "SELECT p FROM ProductWine p "
-            + "WHERE p.productType = :paramType AND p.price between :start "
+            + "WHERE p.productType.type = :paramType AND p.price between :start "
             + " and :end";
     
 
@@ -89,10 +89,6 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         return p;
     }
 
-    /**
-     *
-     *
-     */
     @SuppressWarnings("unchecked")
     @Override
     public List<Product> getPromotedProductsSortedByEndDate(Integer max) {
@@ -265,7 +261,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     @Override
     public List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage) throws WineException {
         List<ProductWine> listWine = null;
-        List<ProductVarietal> list = null;
+        List<ProductVintage> list = null;
         if (!type.getType().equalsIgnoreCase("")
                 && vintage.getYear() != null) {
             list = getSf().getCurrentSession().createQuery(REQTYPEVINTAGE)
@@ -308,21 +304,20 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     }
 
     @Override
-    public List<ProductWine> findByMoneyAndType(ProductType type, int integ, int maxInt) throws WineException {
+    public List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt) throws WineException {
          List<ProductWine> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
             listWine = getSf().getCurrentSession()
-                    .createQuery(REQTYPEMAXMONEY)
+                    .createQuery(REQTYPEMONEY)
                     .setParameter("paramType", type.getType())
-                    .setParameter("start", integ)
-                    .setParameter("end", maxInt)
+                    .setParameter("start", integ.doubleValue())
+                    .setParameter("end", maxInt.doubleValue())
                     .list();
         } else {
             throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
                     "Pas de produit avec un prix aussi eleve.");
         }
-        return listWine;
-        
+        return listWine;        
     }
 
 }

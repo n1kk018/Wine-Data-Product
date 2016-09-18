@@ -116,5 +116,5 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      * @throws WineException 
      */
-    List<ProductWine> findByMoneyAndType(ProductType type, int integ, int maxInt) throws WineException;
+    List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt) throws WineException;
 }
