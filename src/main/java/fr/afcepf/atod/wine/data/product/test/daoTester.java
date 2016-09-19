@@ -35,10 +35,9 @@ public class daoTester {
             for (ProductType productType : types) {   
                 List<ProductVarietal> varietals = daoProduct.getVarietalsByWineType(productType);
                 for (ProductVarietal varietal : varietals) {
-                     List<ProductWine> wines = daoProduct
-                        .findByVarietalAndType(productType,varietal);
+                     List<ProductWine> wines = daoProduct.findByVarietalAndType(productType,varietal,0,5);
                      for (ProductWine wine : wines) {
-                         log.info("\t ##############");
+                         log.info("\t "+wine);
                      }
                 }
             }
