@@ -56,6 +56,9 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     private static final String REQTYPEVARITAL = "SELECT distinct(pv) FROM ProductVarietal pv "
             + "left join fetch pv.productsWine as pw WHERE pv.description = :paramVarietal "
             + "AND pw.productType.type = :paramType";
+    
+    private static final String REQTYPEAPPELLATION = "Select p FROM ProductWine p "
+    		+ "WHERE p.productType.type = :paramType AND p.appellation = :appellation";
 
     private static final String REQTYPEVINTAGE = "SELECT distinct(pv) FROM ProductVintage pv "
             + "left join fetch pv.productsWine as pw WHERE pv.year = :paramVintage "
@@ -67,6 +70,9 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     private static final String REQTYPEMONEY = "SELECT p FROM ProductWine p "
             + "WHERE p.productType.type = :paramType AND p.price between :start "
             + " and :end";
+    
+    private static final String REQTYPE = "SELECT p FROM ProductWine p "
+            + "WHERE p.productType.type = :paramType";
     
 
     /*********************************************
@@ -392,9 +398,64 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 	}
 
 	@Override
-	public Integer countByAppellation(ProductType type, Object o) {
-		// TODO Auto-generated method stub
-		return null;
+	public Integer countByAppellationAndType(ProductType type, String appellation) {
+		Integer count = 0;
+        if (!type.getType().equalsIgnoreCase("")) {
+            count = getSf().getCurrentSession()
+                    .createQuery(REQTYPEAPPELLATION)
+                    .setParameter("paramType", type.getType())
+                    .setParameter("appellation", appellation)
+                    .list().size();
+        }
+        return count; 
+	}
+
+	@Override
+	public List<ProductWine> findByAppelationAndType(ProductType type, String appellation, Integer firstRow,
+			Integer rowsPerPage) throws WineException {
+		List<ProductWine> listWine = null;
+        if (!type.getType().equalsIgnoreCase("")) {
+            listWine = getSf().getCurrentSession()
+                    .createQuery(REQTYPEAPPELLATION)
+                    .setParameter("paramType", type.getType())
+                    .setParameter("appellation", appellation)
+                    .setFirstResult(firstRow)
+                    .setMaxResults(rowsPerPage)
+                    .list();
+        } else {
+            throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                    "Pas de produit de ce type avec cette appellation");
+        }
+        return listWine; 
+	}
+
+	@Override
+	public List<ProductWine> findByType(ProductType type, Integer firstRow, Integer rowsPerPage) throws WineException {
+		List<ProductWine> listWine = null;
+        if (!type.getType().equalsIgnoreCase("")) {
+            listWine = getSf().getCurrentSession()
+                    .createQuery(REQTYPE)
+                    .setParameter("paramType", type.getType())
+                    .setFirstResult(firstRow)
+                    .setMaxResults(rowsPerPage)
+                    .list();
+        } else {
+            throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                    "Pas de produit de ce type");
+        }
+        return listWine;
+	}
+
+	@Override
+	public Integer countByType(ProductType type) {
+		Integer count = 0;
+        if (!type.getType().equalsIgnoreCase("")) {
+            count = getSf().getCurrentSession()
+                    .createQuery(REQTYPE)
+                    .setParameter("paramType", type.getType())
+                    .list().size();
+        }
+        return count; 
 	}
 
 }

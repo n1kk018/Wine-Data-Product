@@ -31,16 +31,19 @@ public class daoTester {
             IDaoProductType daoProductType = (IDaoProductType) bf.getBean(IDaoProductType.class);
             List<ProductWine> list = null;
             List<ProductType> types = daoProductType.findAllObj();
-
-            for (ProductType productType : types) {   
-                List<ProductVarietal> varietals = daoProduct.getVarietalsByWineType(productType);
-                for (ProductVarietal varietal : varietals) {
-                     List<ProductWine> wines = daoProduct.findByVarietalAndType(productType,varietal,0,5);
+            List<ProductWine> wines = daoProduct.findByType(types.get(0),0,5);
+            for (ProductWine wine : wines) {
+                log.info("\t "+wine);
+            }
+            /*for (ProductType productType : types) {   
+                List<String> appellations = daoProduct.getAppellationsByWineType(productType);
+                for (String appellation : appellations) {
+                     List<ProductWine> wines = daoProduct.findByAppelationAndType(productType,appellation,0,5);
                      for (ProductWine wine : wines) {
                          log.info("\t "+wine);
                      }
                 }
-            }
+            }*/
 //			lc =daoC.findAllObj();
 //			for (City city : lc) {
 //				log.info("gtgtgtgt" + city.getName());

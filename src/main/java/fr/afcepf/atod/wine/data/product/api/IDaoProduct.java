@@ -108,6 +108,10 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @throws WineException 
      */
     List<ProductWine> findByMoneyAndType(ProductType type, int integ,Integer firstRow,Integer rowsPerPage) throws WineException;
+    
+    List<ProductWine> findByAppelationAndType(ProductType type, String appellation,Integer firstRow,Integer rowsPerPage) throws WineException;
+    
+    List<ProductWine> findByType(ProductType type, Integer firstRow,Integer rowsPerPage) throws WineException;
     /**
      * 
      * @param type
@@ -122,5 +126,6 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
     Integer countByVintageAndType(ProductType type, ProductVintage vintage);
     Integer countByMoneyAndType(ProductType type, Integer integ);
     Integer countByMoneyAndType(ProductType type, Integer integ,Integer maxInt);
-    Integer countByAppellation(ProductType type, Object o);
+    Integer countByAppellationAndType(ProductType type, String o);
+    Integer countByType(ProductType type);
 }
