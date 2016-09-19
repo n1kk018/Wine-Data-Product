@@ -89,7 +89,7 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      * @throws WineException
      */
-    List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal Varietal) 
+    List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal varietal,Integer firstRow,Integer rowsPerPage) 
             throws WineException;
     /**
      * 
@@ -98,7 +98,7 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      * @throws WineException 
      */
-    List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage)
+    List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage,Integer firstRow,Integer rowsPerPage)
             throws WineException;
     /**
      * 
@@ -107,7 +107,7 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      * @throws WineException 
      */
-    List<ProductWine> findByMoneyAndType(ProductType type, int integ) throws WineException;
+    List<ProductWine> findByMoneyAndType(ProductType type, int integ,Integer firstRow,Integer rowsPerPage) throws WineException;
     /**
      * 
      * @param type
@@ -116,5 +116,11 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      * @throws WineException 
      */
-    List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt) throws WineException;
+    List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt,Integer firstRow,Integer rowsPerPage) throws WineException;
+    
+    Integer countByVarietalAndType(ProductType type, ProductVarietal Varietal);
+    Integer countByVintageAndType(ProductType type, ProductVintage vintage);
+    Integer countByMoneyAndType(ProductType type, Integer integ);
+    Integer countByMoneyAndType(ProductType type, Integer integ,Integer maxInt);
+    Integer countByAppellation(ProductType type, Object o);
 }

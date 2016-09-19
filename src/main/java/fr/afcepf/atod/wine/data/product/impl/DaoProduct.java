@@ -229,7 +229,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal varietal)
+    public List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal varietal, Integer firstRow, Integer rowsPerPage)
             throws WineException {
         List<ProductWine> listWine = null;
         List<ProductVarietal> list = null;
@@ -240,7 +240,8 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     .setParameter("paramVarietal", varietal.getDescription())
                     .list();
             if (!list.isEmpty()) {
-                listWine = new ArrayList(list.get(0).getProductsWine());
+            	ArrayList<ProductWine> listTemp = new ArrayList(list.get(0).getProductsWine());
+                listWine = listTemp.subList(firstRow, (firstRow+rowsPerPage<listTemp.size()-1 ? firstRow+rowsPerPage : listTemp.size()-1 ));
             } else {
                 throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
                     "the products according to the type "
@@ -259,7 +260,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     }
 
     @Override
-    public List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage) throws WineException {
+    public List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage, Integer firstRow, Integer rowsPerPage) throws WineException {
         List<ProductWine> listWine = null;
         List<ProductVintage> list = null;
         if (!type.getType().equalsIgnoreCase("")
@@ -267,9 +268,12 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
             list = getSf().getCurrentSession().createQuery(REQTYPEVINTAGE)
                     .setParameter("paramType", type.getType())
                     .setParameter("paramVintage",vintage.getYear())
+                    .setFirstResult(firstRow)
+                    .setMaxResults(rowsPerPage)
                     .list();
             if (!list.isEmpty()) {
-                listWine = new ArrayList(list.get(0).getProductsWine());
+            	ArrayList<ProductWine> listTemp = new ArrayList(list.get(0).getProductsWine());
+                listWine = listTemp.subList(firstRow, (firstRow+rowsPerPage<listTemp.size()-1 ? firstRow+rowsPerPage : listTemp.size()-1 ));
             } else {
                 throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
                     "the products according to the type "
@@ -288,13 +292,15 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     }    
 
     @Override
-    public List<ProductWine> findByMoneyAndType(ProductType type, int integ) throws WineException {
+    public List<ProductWine> findByMoneyAndType(ProductType type, int integ, Integer firstRow, Integer rowsPerPage) throws WineException {
         List<ProductWine> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
             listWine = getSf().getCurrentSession()
                     .createQuery(REQTYPEMAXMONEY)
                     .setParameter("paramType", type.getType())
                     .setParameter("paramMin", integ)
+                    .setFirstResult(firstRow)
+                    .setMaxResults(rowsPerPage)
                     .list();
         } else {
             throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
@@ -303,21 +309,92 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         return listWine;
     }
 
-    @Override
-    public List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt) throws WineException {
-         List<ProductWine> listWine = null;
+
+	@Override
+	public List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt, Integer firstRow,
+			Integer rowsPerPage) throws WineException {
+		List<ProductWine> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
             listWine = getSf().getCurrentSession()
                     .createQuery(REQTYPEMONEY)
                     .setParameter("paramType", type.getType())
                     .setParameter("start", integ.doubleValue())
                     .setParameter("end", maxInt.doubleValue())
+                    .setFirstResult(firstRow)
+                    .setMaxResults(rowsPerPage)
                     .list();
         } else {
             throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
                     "Pas de produit avec un prix aussi eleve.");
         }
-        return listWine;        
-    }
+        return listWine; 
+	}
+
+	@Override
+	public Integer countByVarietalAndType(ProductType wineType, ProductVarietal varietal) {
+		 	Integer count =0;
+	        List<ProductVarietal> list = null;
+	        if (!wineType.getType().equalsIgnoreCase("")
+	                && !varietal.getDescription().equalsIgnoreCase("")) {
+	            list = getSf().getCurrentSession().createQuery(REQTYPEVARITAL)
+	                    .setParameter("paramType", wineType.getType())
+	                    .setParameter("paramVarietal", varietal.getDescription())
+	                    .list();
+	            if (!list.isEmpty()) {
+	            	count = new ArrayList(list.get(0).getProductsWine()).size();
+	            } 
+	        } 
+	        return count;
+	}
+
+	@Override
+	public Integer countByVintageAndType(ProductType type, ProductVintage vintage) {
+		Integer count =0;
+        List<ProductVintage> list = null;
+        if (!type.getType().equalsIgnoreCase("")
+                && vintage.getYear() != null) {
+            list = getSf().getCurrentSession().createQuery(REQTYPEVINTAGE)
+                    .setParameter("paramType", type.getType())
+                    .setParameter("paramVintage",vintage.getYear())
+                    .list();
+            if (!list.isEmpty()) {
+                count = new ArrayList(list.get(0).getProductsWine()).size();
+            }
+        }
+		return count;
+	}
+
+	@Override
+	public Integer countByMoneyAndType(ProductType type, Integer integ) {
+		Integer count = 0;
+        if (!type.getType().equalsIgnoreCase("")) {
+            count = getSf().getCurrentSession()
+                    .createQuery(REQTYPEMAXMONEY)
+                    .setParameter("paramType", type.getType())
+                    .setParameter("paramMin", integ)
+                    .list().size();
+        } 
+        return count;
+	}
+
+	@Override
+	public Integer countByMoneyAndType(ProductType type, Integer integ, Integer maxInt) {
+		Integer count = 0;
+        if (!type.getType().equalsIgnoreCase("")) {
+            count = getSf().getCurrentSession()
+                    .createQuery(REQTYPEMONEY)
+                    .setParameter("paramType", type.getType())
+                    .setParameter("start", integ.doubleValue())
+                    .setParameter("end", maxInt.doubleValue())
+                    .list().size();
+        }
+        return count; 
+	}
+
+	@Override
+	public Integer countByAppellation(ProductType type, Object o) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
