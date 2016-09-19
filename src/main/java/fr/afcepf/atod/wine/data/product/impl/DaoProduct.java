@@ -27,11 +27,14 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
      ****************************************************/
     private static final String REQFINDBYNAME = "SELECT p FROM Product p " + "WHERE p.name like :name";
 
-    private static final String REQEXPPROD = "SELECT p FROM Product p WHERE p.price > :paramMin";
+    private static final String REQEXPPROD = "SELECT distinct(p) FROM Product p LEFT JOIN FETCH p.productSuppliers WHERE 0 < ANY"
+            + "(SELECT ps.quantity from ProductSupplier ps WHERE ps.pk.product=p)" 
+    		+ " AND p.price > :paramMin";
 
     private static final String REQGETPROMOTEDPRODUCTSSORTEDBYENDDATE = "SELECT"
             + " p FROM Product p LEFT JOIN FETCH p.productSuppliers WHERE 0 < ANY"
-            + "(SELECT ps.quantity from ProductSupplier ps WHERE ps.pk.product=p)" + " AND  p.speEvent IS NOT NULL";
+            + "(SELECT ps.quantity from ProductSupplier ps WHERE ps.pk.product=p)" 
+            + " AND  p.speEvent IS NOT NULL";
 
     private static final String REQAPPELLATIONSBYWINETYPE = "SELECT DISTINCT p.appellation "
             + "FROM Product p WHERE p.productType = :type";
@@ -259,8 +262,10 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         return listWine;
     }
 
-    @Override
-    public List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage, Integer firstRow, Integer rowsPerPage) throws WineException {
+    @SuppressWarnings("unchecked")
+	@Override
+    public List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage,
+    		Integer firstRow, Integer rowsPerPage) throws WineException {
         List<ProductWine> listWine = null;
         List<ProductVintage> list = null;
         if (!type.getType().equalsIgnoreCase("")
@@ -291,7 +296,8 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         return listWine;
     }    
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public List<ProductWine> findByMoneyAndType(ProductType type, int integ, Integer firstRow, Integer rowsPerPage) throws WineException {
         List<ProductWine> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
@@ -310,6 +316,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     }
 
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt, Integer firstRow,
 			Integer rowsPerPage) throws WineException {
@@ -330,6 +337,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         return listWine; 
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Integer countByVarietalAndType(ProductType wineType, ProductVarietal varietal) {
 		 	Integer count =0;
@@ -347,6 +355,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 	        return count;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Integer countByVintageAndType(ProductType type, ProductVintage vintage) {
 		Integer count =0;
@@ -393,7 +402,6 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
 	@Override
 	public Integer countByAppellation(ProductType type, Object o) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
