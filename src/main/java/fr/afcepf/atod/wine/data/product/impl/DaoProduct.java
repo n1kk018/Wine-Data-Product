@@ -68,7 +68,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
             + "AND pw.productType.type = :paramType";
     
     private static final String REQTYPEMAXMONEY = "SELECT p FROM ProductWine p "
-            + "WHERE p.productType = :paramType AND p.price > :paramMin";
+            + "WHERE p.productType.type = :paramType AND p.price > :paramMin";
     
     private static final String REQTYPEMONEY = "SELECT p FROM ProductWine p "
             + "WHERE p.productType.type = :paramType AND p.price between :start "
@@ -304,13 +304,13 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
     @SuppressWarnings("unchecked")
 	@Override
-    public List<ProductWine> findByMoneyAndType(ProductType type, int integ, Integer firstRow, Integer rowsPerPage) throws WineException {
+    public List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer firstRow, Integer rowsPerPage) throws WineException {
         List<ProductWine> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
             listWine = getSf().getCurrentSession()
                     .createQuery(REQTYPEMAXMONEY)
                     .setParameter("paramType", type.getType())
-                    .setParameter("paramMin", integ)
+                    .setParameter("paramMin", integ.doubleValue())
                     .setFirstResult(firstRow)
                     .setMaxResults(rowsPerPage)
                     .list();
@@ -386,7 +386,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
             count = getSf().getCurrentSession()
                     .createQuery(REQTYPEMAXMONEY)
                     .setParameter("paramType", type.getType())
-                    .setParameter("paramMin", integ)
+                    .setParameter("paramMin", integ.doubleValue())
                     .list().size();
         } 
         return count;
@@ -470,5 +470,4 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 	public Integer countByAppellation(ProductType type, Object o) {
 		return null;
 	}
-
 }
