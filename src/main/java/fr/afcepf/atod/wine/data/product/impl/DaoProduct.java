@@ -48,6 +48,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
     private static final String REQFINDBYTYPE = "SELECT distinct(pt) FROM ProductType pt "
             + "left join fetch pt.productsWine where pt.type like :paramType";
+    
     private static final String REQFINDBYVINTAGE = "SELECT distinct(pv) FROM ProductVintage pv "
             + "left join fetch pv.productsWine"
             + "  where pv.year =:paramVintage";
@@ -355,7 +356,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 	                    .setParameter("paramVarietal", varietal.getDescription())
 	                    .list();
 	            if (!list.isEmpty()) {
-	            	count = new ArrayList(list.get(0).getProductsWine()).size();
+	            	count = list.get(0).getProductsWine().toArray().length;
 	            } 
 	        } 
 	        return count;
@@ -373,7 +374,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     .setParameter("paramVintage",vintage.getYear())
                     .list();
             if (!list.isEmpty()) {
-                count = new ArrayList(list.get(0).getProductsWine()).size();
+                count = list.get(0).getProductsWine().toArray().length;
             }
         }
 		return count;
