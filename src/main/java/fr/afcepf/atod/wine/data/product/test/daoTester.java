@@ -30,18 +30,18 @@ public class daoTester {
             fr.afcepf.atod.wine.data.product.api.IDaoCity daoC
                     = (IDaoCity) bf.getBean(IDaoCity.class);
             IDaoProductType daoProductType = (IDaoProductType) bf.getBean(IDaoProductType.class);
-            List<ProductWine> list = null;
+            //List<ProductWine> list = null;
             List<ProductType> types = daoProductType.findAllObj();
-            for (ProductType productType : types) { 
+            /*for (ProductType productType : types) { 
             	log.info(daoProduct.countByMoneyAndType(productType, 0,50));
             	log.info(daoProduct.countByMoneyAndType(productType, 50,100));
             	//log.info(daoProduct.countByMoneyAndType(productType, 100));
-            }
-            /*List<ProductWine> wines = daoProduct.findByType(types.get(0),0,5);
+            }*/
+            List<ProductWine> wines = daoProduct.findByType(types.get(0),0,5,"speEvent","desc");
             for (ProductWine wine : wines) {
                 log.info("\t "+wine);
             }
-            log.info(daoProduct.countByType(types.get(0)));*/
+            log.info(daoProduct.countByType(types.get(0)));
             
             /*for (ProductType productType : types) {   
                 List<String> appellations = daoProduct.getAppellationsByWineType(productType);

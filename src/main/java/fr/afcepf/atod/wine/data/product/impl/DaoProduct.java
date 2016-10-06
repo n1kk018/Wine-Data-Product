@@ -77,7 +77,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
             + "WHERE p.productType.type = :paramType AND p.price between :start "
             + " and :end";
     
-    private static final String REQTYPE = "SELECT p FROM ProductWine p "
+    private static final String REQTYPE = "SELECT DISTINCT p FROM ProductWine p "
             + "WHERE p.productType.type = :paramType";
     
 
@@ -88,8 +88,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     public Product findByName(String name) throws WineException {
         Product p = null;
         if (!name.equals("")) {
-            p = (Product) (getSf().getCurrentSession().createQuery(REQFINDBYNAME).setParameter("name", "%" + name + "%")
-                    .uniqueResult());
+            p = (Product)(getSf().getCurrentSession().createQuery(REQFINDBYNAME).setParameter("name", "%" + name + "%").uniqueResult());
             if (p == null) {
                 throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
                         "the product named " + name + " has not been" + " found in the database.");
@@ -252,7 +251,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     .setParameter("paramVarietal", varietal.getDescription())
                     .list();
             if (!list.isEmpty()) {
-            	ArrayList<ProductWine> listTemp = new ArrayList(list.get(0).getProductsWine());
+            	ArrayList<ProductWine> listTemp = new ArrayList<ProductWine>(list.get(0).getProductsWine());
                 listWine = listTemp.subList(firstRow, (firstRow+rowsPerPage<listTemp.size() ? firstRow+rowsPerPage : listTemp.size() ));
             } else {
                 throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
@@ -286,7 +285,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     .setMaxResults(rowsPerPage)
                     .list();
             if (!list.isEmpty()) {
-            	ArrayList<ProductWine> listTemp = new ArrayList(list.get(0).getProductsWine());
+            	ArrayList<ProductWine> listTemp = new ArrayList<ProductWine>(list.get(0).getProductsWine());
                 listWine = listTemp.subList(firstRow, (firstRow+rowsPerPage<listTemp.size() ? firstRow+rowsPerPage : listTemp.size() ));
             } else {
                 throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
@@ -422,7 +421,8 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         return count; 
 	}
 
-	@Override
+	@SuppressWarnings("unchecked")
+    @Override
 	public List<ProductWine> findByAppelationAndType(ProductType type, String appellation, Integer firstRow,
 			Integer rowsPerPage) throws WineException {
 		List<ProductWine> listWine = null;
@@ -441,14 +441,13 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         return listWine; 
 	}
 
-	@Override
+	@SuppressWarnings("unchecked")
+    @Override
 	public List<ProductWine> findByType(ProductType type, Integer firstRow, Integer rowsPerPage,String sorting_field, String sorting_dir) throws WineException {
 		List<ProductWine> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
-            /*Criteria criteria = getSf().getCurrentSession().createCriteria(ProductWine.class, "Wine");
-            criteria.addOrder(Order.desc("name"));*/
             listWine = getSf().getCurrentSession()
-                    .createQuery(REQTYPE)
+                    .createQuery(REQTYPE+" ORDER BY p."+sorting_field+" "+sorting_dir)
                     .setParameter("paramType", type.getType())
                     .setFirstResult(firstRow)
                     .setMaxResults(rowsPerPage)
