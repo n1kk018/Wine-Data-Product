@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.springframework.stereotype.Service;
 
 import fr.afcepf.atod.vin.data.exception.WineErrorCode;
@@ -251,7 +253,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     .list();
             if (!list.isEmpty()) {
             	ArrayList<ProductWine> listTemp = new ArrayList(list.get(0).getProductsWine());
-                listWine = listTemp.subList(firstRow, (firstRow+rowsPerPage<listTemp.size()-1 ? firstRow+rowsPerPage : listTemp.size()-1 ));
+                listWine = listTemp.subList(firstRow, (firstRow+rowsPerPage<listTemp.size() ? firstRow+rowsPerPage : listTemp.size() ));
             } else {
                 throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
                     "the products according to the type "
@@ -285,7 +287,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     .list();
             if (!list.isEmpty()) {
             	ArrayList<ProductWine> listTemp = new ArrayList(list.get(0).getProductsWine());
-                listWine = listTemp.subList(firstRow, (firstRow+rowsPerPage<listTemp.size()-1 ? firstRow+rowsPerPage : listTemp.size()-1 ));
+                listWine = listTemp.subList(firstRow, (firstRow+rowsPerPage<listTemp.size() ? firstRow+rowsPerPage : listTemp.size() ));
             } else {
                 throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
                     "the products according to the type "
@@ -356,7 +358,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 	                    .setParameter("paramVarietal", varietal.getDescription())
 	                    .list();
 	            if (!list.isEmpty()) {
-	            	count = list.get(0).getProductsWine().toArray().length;
+	            	count = list.get(0).getProductsWine().size();
 	            } 
 	        } 
 	        return count;
@@ -374,7 +376,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     .setParameter("paramVintage",vintage.getYear())
                     .list();
             if (!list.isEmpty()) {
-                count = list.get(0).getProductsWine().toArray().length;
+                count = list.get(0).getProductsWine().size();
             }
         }
 		return count;
@@ -440,9 +442,11 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 	}
 
 	@Override
-	public List<ProductWine> findByType(ProductType type, Integer firstRow, Integer rowsPerPage) throws WineException {
+	public List<ProductWine> findByType(ProductType type, Integer firstRow, Integer rowsPerPage,String sorting_field, String sorting_dir) throws WineException {
 		List<ProductWine> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
+            /*Criteria criteria = getSf().getCurrentSession().createCriteria(ProductWine.class, "Wine");
+            criteria.addOrder(Order.desc("name"));*/
             listWine = getSf().getCurrentSession()
                     .createQuery(REQTYPE)
                     .setParameter("paramType", type.getType())
