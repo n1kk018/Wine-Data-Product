@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.transaction.Transactional;
 
-import org.hibernate.Criteria;
-import org.hibernate.criterion.Order;
 import org.springframework.stereotype.Service;
 
 import fr.afcepf.atod.vin.data.exception.WineErrorCode;
@@ -17,7 +15,14 @@ import fr.afcepf.atod.wine.entity.ProductType;
 import fr.afcepf.atod.wine.entity.ProductVarietal;
 import fr.afcepf.atod.wine.entity.ProductVintage;
 import fr.afcepf.atod.wine.entity.ProductWine;
+
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Set;
 
 @Service
@@ -59,21 +64,21 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
             + "left join fetch pv.productsWine pw"
             + "  where pw.description like :paramVarietal";
 
-    private static final String REQTYPEVARITAL = "SELECT distinct(pv) FROM ProductVarietal pv "
+    private static final String REQTYPEVARITAL = "SELECT DISTINCT pv FROM ProductVarietal pv "
             + "left join fetch pv.productsWine as pw WHERE pv.description = :paramVarietal "
             + "AND pw.productType.type = :paramType";
     
-    private static final String REQTYPEAPPELLATION = "Select p FROM ProductWine p "
+    private static final String REQTYPEAPPELLATION = "Select DISTINCT p FROM ProductWine p "
     		+ "WHERE p.productType.type = :paramType AND p.appellation = :appellation";
 
-    private static final String REQTYPEVINTAGE = "SELECT distinct(pv) FROM ProductVintage pv "
+    private static final String REQTYPEVINTAGE = "SELECT DISTINCT pv FROM ProductVintage pv "
             + "left join fetch pv.productsWine as pw WHERE pv.year = :paramVintage "
             + "AND pw.productType.type = :paramType";
     
-    private static final String REQTYPEMAXMONEY = "SELECT p FROM ProductWine p "
+    private static final String REQTYPEMAXMONEY = "SELECT DISTINCT p FROM ProductWine p "
             + "WHERE p.productType.type = :paramType AND p.price > :paramMin";
     
-    private static final String REQTYPEMONEY = "SELECT p FROM ProductWine p "
+    private static final String REQTYPEMONEY = "SELECT DISTINCT p FROM ProductWine p "
             + "WHERE p.productType.type = :paramType AND p.price between :start "
             + " and :end";
     
@@ -238,9 +243,9 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         return l;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked"})
     @Override
-    public List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal varietal, Integer firstRow, Integer rowsPerPage)
+    public List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal varietal, Integer firstRow, Integer rowsPerPage, String sorting_field, String sorting_dir)
             throws WineException {
         List<ProductWine> listWine = null;
         List<ProductVarietal> list = null;
@@ -252,6 +257,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     .list();
             if (!list.isEmpty()) {
             	ArrayList<ProductWine> listTemp = new ArrayList<ProductWine>(list.get(0).getProductsWine());
+            	//sublistSorting(listTemp,sorting_field,sorting_dir);
                 listWine = listTemp.subList(firstRow, (firstRow+rowsPerPage<listTemp.size() ? firstRow+rowsPerPage : listTemp.size() ));
             } else {
                 throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
@@ -268,6 +274,29 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     + " found in the database.");
         }
         return listWine;
+    }
+    
+    private void sublistSorting(List<ProductWine> listTemp, String sorting_field, String sorting_dir) {
+        try {
+            Method getter = new PropertyDescriptor(sorting_field, ProductWine.class).getReadMethod();
+            listTemp.sort((o1,o2) -> myWrappedComparatorMethod(o1,o2,getter));
+            if(sorting_dir.equals("desc")) {
+                Collections.reverse(listTemp);
+            }
+        } catch (IntrospectionException paramE) {
+            paramE.printStackTrace();
+        }
+    }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private Integer myWrappedComparatorMethod(ProductWine o1,ProductWine o2, Method getter) {
+        Integer res=null;
+        try {
+            res = (Integer)((Comparable) getter.invoke(o1)).compareTo(getter.invoke(o2));
+        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException paramE) {
+              paramE.printStackTrace();
+        }
+        return res;
     }
 
     @SuppressWarnings("unchecked")
@@ -306,11 +335,11 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
     @SuppressWarnings("unchecked")
 	@Override
-    public List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer firstRow, Integer rowsPerPage) throws WineException {
+    public List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer firstRow, Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException {
         List<ProductWine> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
             listWine = getSf().getCurrentSession()
-                    .createQuery(REQTYPEMAXMONEY)
+                    .createQuery(REQTYPEMAXMONEY+" ORDER BY p."+sorting_field+" "+sorting_dir)
                     .setParameter("paramType", type.getType())
                     .setParameter("paramMin", integ.doubleValue())
                     .setFirstResult(firstRow)
@@ -327,11 +356,11 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt, Integer firstRow,
-			Integer rowsPerPage) throws WineException {
+			Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException {
 		List<ProductWine> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
             listWine = getSf().getCurrentSession()
-                    .createQuery(REQTYPEMONEY)
+                    .createQuery(REQTYPEMONEY+" ORDER BY p."+sorting_field+" "+sorting_dir)
                     .setParameter("paramType", type.getType())
                     .setParameter("start", integ.doubleValue())
                     .setParameter("end", maxInt.doubleValue())
@@ -423,12 +452,11 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
 	@SuppressWarnings("unchecked")
     @Override
-	public List<ProductWine> findByAppelationAndType(ProductType type, String appellation, Integer firstRow,
-			Integer rowsPerPage) throws WineException {
+	public List<ProductWine> findByAppelationAndType(ProductType type, String appellation, Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException {
 		List<ProductWine> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
             listWine = getSf().getCurrentSession()
-                    .createQuery(REQTYPEAPPELLATION)
+                    .createQuery(REQTYPEAPPELLATION+" ORDER BY p."+sorting_field+" "+sorting_dir)
                     .setParameter("paramType", type.getType())
                     .setParameter("appellation", appellation)
                     .setFirstResult(firstRow)

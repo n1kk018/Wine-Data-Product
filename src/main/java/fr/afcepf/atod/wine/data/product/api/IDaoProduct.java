@@ -1,5 +1,7 @@
 package fr.afcepf.atod.wine.data.product.api;
 
+import java.beans.IntrospectionException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import fr.afcepf.atod.vin.data.exception.WineException;
@@ -89,7 +91,7 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      * @throws WineException
      */
-    List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal varietal,Integer firstRow,Integer rowsPerPage) 
+    List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal varietal,Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) 
             throws WineException;
     /**
      * 
@@ -107,9 +109,9 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      * @throws WineException 
      */
-    List<ProductWine> findByMoneyAndType(ProductType type, Integer integ,Integer firstRow,Integer rowsPerPage) throws WineException;
+    List<ProductWine> findByMoneyAndType(ProductType type, Integer integ,Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
     
-    List<ProductWine> findByAppelationAndType(ProductType type, String appellation,Integer firstRow,Integer rowsPerPage) throws WineException;
+    List<ProductWine> findByAppelationAndType(ProductType type, String appellation,Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
     
     List<ProductWine> findByType(ProductType type, Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
     /**
@@ -120,7 +122,7 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      * @throws WineException 
      */
-    List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt,Integer firstRow,Integer rowsPerPage) throws WineException;
+    List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt,Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
     
     Integer countByVarietalAndType(ProductType type, ProductVarietal Varietal);
     Integer countByVintageAndType(ProductType type, ProductVintage vintage);
