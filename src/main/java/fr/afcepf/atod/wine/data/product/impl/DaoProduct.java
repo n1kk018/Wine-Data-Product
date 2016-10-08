@@ -15,6 +15,7 @@ import fr.afcepf.atod.wine.entity.ProductType;
 import fr.afcepf.atod.wine.entity.ProductVarietal;
 import fr.afcepf.atod.wine.entity.ProductVintage;
 import fr.afcepf.atod.wine.entity.ProductWine;
+import fr.afcepf.atod.wine.entity.SpecialEvent;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -257,7 +258,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     .list();
             if (!list.isEmpty()) {
             	ArrayList<ProductWine> listTemp = new ArrayList<ProductWine>(list.get(0).getProductsWine());
-            	//sublistSorting(listTemp,sorting_field,sorting_dir);
+            	sublistSorting(listTemp,sorting_field,sorting_dir);
                 listWine = listTemp.subList(firstRow, (firstRow+rowsPerPage<listTemp.size() ? firstRow+rowsPerPage : listTemp.size() ));
             } else {
                 throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
@@ -290,9 +291,18 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private Integer myWrappedComparatorMethod(ProductWine o1,ProductWine o2, Method getter) {
-        Integer res=null;
+        Integer res=0;
         try {
-            res = (Integer)((Comparable) getter.invoke(o1)).compareTo(getter.invoke(o2));
+            if (getter.invoke(o1) == null ^ getter.invoke(o2) == null) {
+                return (getter.invoke(o1) == null) ? -1 : 1;
+            }
+
+            if (getter.invoke(o1) == null && getter.invoke(o2) == null) {
+                return 0;
+            }
+            if(getter.invoke(o1).getClass()!=SpecialEvent.class) {
+                res = (Integer)((Comparable) getter.invoke(o1)).compareTo(getter.invoke(o2));
+            }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException paramE) {
               paramE.printStackTrace();
         }
