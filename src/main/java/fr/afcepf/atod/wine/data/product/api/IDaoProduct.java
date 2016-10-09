@@ -1,7 +1,5 @@
 package fr.afcepf.atod.wine.data.product.api;
 
-import java.beans.IntrospectionException;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
 import fr.afcepf.atod.vin.data.exception.WineException;
