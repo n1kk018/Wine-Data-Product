@@ -1,11 +1,14 @@
 package fr.afcepf.atod.wine.data.product.test;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import de.malkusch.localized.LocalizedIntegrator;
+import de.malkusch.localized.localeResolver.ThreadLocalLocaleResolver;
 import fr.afcepf.atod.wine.data.product.api.IDaoCity;
 import fr.afcepf.atod.wine.data.product.api.IDaoProduct;
 import fr.afcepf.atod.wine.data.product.api.IDaoProductType;
@@ -24,20 +27,23 @@ public class daoTester {
 
     public static void main(String[] args) {
         try {
+            Locale.setDefault(Locale.US);
             @SuppressWarnings("resource")
             BeanFactory bf = new ClassPathXmlApplicationContext("classpath:springData.xml");
-            IDaoProduct daoProduct = (IDaoProduct) bf.getBean(IDaoProduct.class);
-            fr.afcepf.atod.wine.data.product.api.IDaoCity daoC
-                    = (IDaoCity) bf.getBean(IDaoCity.class);
+            //IDaoProduct daoProduct = (IDaoProduct) bf.getBean(IDaoProduct.class);
+            
+            /*fr.afcepf.atod.wine.data.product.api.IDaoCity daoC
+                    = (IDaoCity) bf.getBean(IDaoCity.class);*/
             IDaoProductType daoProductType = (IDaoProductType) bf.getBean(IDaoProductType.class);
             //List<ProductWine> list = null;
             List<ProductType> types = daoProductType.findAllObj();
-            /*for (ProductType productType : types) { 
-            	log.info(daoProduct.countByMoneyAndType(productType, 0,50));
-            	log.info(daoProduct.countByMoneyAndType(productType, 50,100));
+            for (ProductType productType : types) { 
+                log.info(productType.getType());
+            	/*log.info(daoProduct.countByMoneyAndType(productType, 0,50));
+            	log.info(daoProduct.countByMoneyAndType(productType, 50,100));*/
             	//log.info(daoProduct.countByMoneyAndType(productType, 100));
-            }*/
-            List<ProductWine> wines = daoProduct.findByType(types.get(0),0,5,"speEvent","desc");
+            }
+            /*List<ProductWine> wines = daoProduct.findByType(types.get(0),0,5,"speEvent","desc");
             for (ProductWine wine : wines) {
                 log.info("\t "+wine);
             }
