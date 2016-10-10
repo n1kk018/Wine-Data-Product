@@ -290,18 +290,17 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
     private Integer myWrappedComparatorMethod(ProductWine o1,ProductWine o2, Method getter) {
-        Integer res=null;
+        Integer res=0;
         try {
+            if (getter.invoke(o1) == null ^ getter.invoke(o2) == null) {
+                return (getter.invoke(o1) == null) ? -1 : 1;
+            }
+
+            if (getter.invoke(o1) == null && getter.invoke(o2) == null) {
+                return 0;
+            }
             if(getter.invoke(o1).getClass()!=SpecialEvent.class) {
                 res = (Integer)((Comparable) getter.invoke(o1)).compareTo(getter.invoke(o2));
-            } else {
-                if (getter.invoke(o1) == null ^ getter.invoke(o2) == null) {
-                    res = (getter.invoke(o1) == null) ? -1 : 1;
-                } else if (getter.invoke(o1) == null && getter.invoke(o2) == null) {
-                    res = 0;
-                } else {
-                    res = (Integer)((Comparable) getter.invoke(o1)).compareTo(getter.invoke(o2));
-                }
             }
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException paramE) {
               paramE.printStackTrace();
