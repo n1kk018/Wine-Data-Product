@@ -89,7 +89,7 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      * @throws WineException
      */
-    List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal varietal,Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) 
+    List<Product> findByVarietalAndType(ProductType wineType, ProductVarietal varietal,Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) 
             throws WineException;
     /**
      * 
@@ -98,7 +98,7 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      * @throws WineException 
      */
-    List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage,Integer firstRow,Integer rowsPerPage)
+    List<Product> findByVintageAndType(ProductType type, ProductVintage vintage,Integer firstRow,Integer rowsPerPage)
             throws WineException;
     /**
      * 
@@ -107,11 +107,11 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      * @throws WineException 
      */
-    List<ProductWine> findByMoneyAndType(ProductType type, Integer integ,Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
+    List<Product> findByMoneyAndType(ProductType type, Integer integ,Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
     
-    List<ProductWine> findByAppelationAndType(ProductType type, String appellation,Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
+    List<Product> findByAppelationAndType(ProductType type, String appellation,Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
     
-    List<ProductWine> findByType(ProductType type, Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
+    List<Product> findByType(ProductType type, Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
     /**
      * 
      * @param type
@@ -120,7 +120,7 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
      * @return
      * @throws WineException 
      */
-    List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt,Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
+    List<Product> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt,Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
     
     Integer countByVarietalAndType(ProductType type, ProductVarietal Varietal);
     Integer countByVintageAndType(ProductType type, ProductVintage vintage);

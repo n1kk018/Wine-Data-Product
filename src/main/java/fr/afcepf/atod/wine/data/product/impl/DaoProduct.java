@@ -245,9 +245,9 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
     @SuppressWarnings({ "unchecked"})
     @Override
-    public List<ProductWine> findByVarietalAndType(ProductType wineType, ProductVarietal varietal, Integer firstRow, Integer rowsPerPage, String sorting_field, String sorting_dir)
+    public List<Product> findByVarietalAndType(ProductType wineType, ProductVarietal varietal, Integer firstRow, Integer rowsPerPage, String sorting_field, String sorting_dir)
             throws WineException {
-        List<ProductWine> listWine = null;
+        List<Product> listWine = null;
         List<ProductVarietal> list = null;
         if (!wineType.getType().equalsIgnoreCase("")
                 && !varietal.getDescription().equalsIgnoreCase("")) {
@@ -256,7 +256,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     .setParameter("paramVarietal", varietal.getDescription())
                     .list();
             if (!list.isEmpty()) {
-            	ArrayList<ProductWine> listTemp = new ArrayList<ProductWine>(list.get(0).getProductsWine());
+            	ArrayList<Product> listTemp = new ArrayList<Product>(list.get(0).getProductsWine());
             	sublistSorting(listTemp,sorting_field,sorting_dir);
                 listWine = listTemp.subList(firstRow, (firstRow+rowsPerPage<listTemp.size() ? firstRow+rowsPerPage : listTemp.size() ));
             } else {
@@ -276,12 +276,12 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
         return listWine;
     }
     
-    private void sublistSorting(List<ProductWine> listTemp, String sorting_field, String sorting_dir) {
+    private void sublistSorting(ArrayList<Product> paramListTemp, String sorting_field, String sorting_dir) {
         try {
             Method getter = new PropertyDescriptor(sorting_field, ProductWine.class).getReadMethod();
-            listTemp.sort((o1,o2) -> myWrappedComparatorMethod(o1,o2,getter));
+            paramListTemp.sort((o1,o2) -> myWrappedComparatorMethod(o1,o2,getter));
             if(sorting_dir.equals("desc")) {
-                Collections.reverse(listTemp);
+                Collections.reverse(paramListTemp);
             }
         } catch (IntrospectionException paramE) {
             paramE.printStackTrace();
@@ -289,7 +289,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private Integer myWrappedComparatorMethod(ProductWine o1,ProductWine o2, Method getter) {
+    private Integer myWrappedComparatorMethod(Product o1,Product o2, Method getter) {
         Integer res=0;
         try {
             if (getter.invoke(o1) == null ^ getter.invoke(o2) == null) {
@@ -312,9 +312,9 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     
     @SuppressWarnings("unchecked")
 	@Override
-    public List<ProductWine> findByVintageAndType(ProductType type, ProductVintage vintage,
+    public List<Product> findByVintageAndType(ProductType type, ProductVintage vintage,
     		Integer firstRow, Integer rowsPerPage) throws WineException {
-        List<ProductWine> listWine = null;
+        List<Product> listWine = null;
         List<ProductVintage> list = null;
         if (!type.getType().equalsIgnoreCase("")
                 && vintage.getYear() != null) {
@@ -325,7 +325,7 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
                     .setMaxResults(rowsPerPage)
                     .list();
             if (!list.isEmpty()) {
-            	ArrayList<ProductWine> listTemp = new ArrayList<ProductWine>(list.get(0).getProductsWine());
+            	ArrayList<Product> listTemp = new ArrayList<Product>(list.get(0).getProductsWine());
                 listWine = listTemp.subList(firstRow, (firstRow+rowsPerPage<listTemp.size() ? firstRow+rowsPerPage : listTemp.size() ));
             } else {
                 throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
@@ -346,8 +346,8 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
     @SuppressWarnings("unchecked")
 	@Override
-    public List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer firstRow, Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException {
-        List<ProductWine> listWine = null;
+    public List<Product> findByMoneyAndType(ProductType type, Integer integ, Integer firstRow, Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException {
+        List<Product> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
             listWine = getSf().getCurrentSession()
                     .createQuery(REQTYPEMAXMONEY+" ORDER BY p."+sorting_field+" "+sorting_dir)
@@ -366,9 +366,9 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<ProductWine> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt, Integer firstRow,
+	public List<Product> findByMoneyAndType(ProductType type, Integer integ, Integer maxInt, Integer firstRow,
 			Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException {
-		List<ProductWine> listWine = null;
+		List<Product> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
             listWine = getSf().getCurrentSession()
                     .createQuery(REQTYPEMONEY+" ORDER BY p."+sorting_field+" "+sorting_dir)
@@ -463,8 +463,8 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
 	@SuppressWarnings("unchecked")
     @Override
-	public List<ProductWine> findByAppelationAndType(ProductType type, String appellation, Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException {
-		List<ProductWine> listWine = null;
+	public List<Product> findByAppelationAndType(ProductType type, String appellation, Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException {
+		List<Product> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
             listWine = getSf().getCurrentSession()
                     .createQuery(REQTYPEAPPELLATION+" ORDER BY p."+sorting_field+" "+sorting_dir)
@@ -482,8 +482,8 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 
 	@SuppressWarnings("unchecked")
     @Override
-	public List<ProductWine> findByType(ProductType type, Integer firstRow, Integer rowsPerPage,String sorting_field, String sorting_dir) throws WineException {
-		List<ProductWine> listWine = null;
+	public List<Product> findByType(ProductType type, Integer firstRow, Integer rowsPerPage,String sorting_field, String sorting_dir) throws WineException {
+		List<Product> listWine = null;
         if (!type.getType().equalsIgnoreCase("")) {
             listWine = getSf().getCurrentSession()
                     .createQuery(REQTYPE+" ORDER BY p."+sorting_field+" "+sorting_dir)
