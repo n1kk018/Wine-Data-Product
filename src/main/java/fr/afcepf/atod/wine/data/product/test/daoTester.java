@@ -9,12 +9,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import de.malkusch.localized.LocalizedIntegrator;
 import de.malkusch.localized.localeResolver.ThreadLocalLocaleResolver;
-import fr.afcepf.atod.wine.data.product.api.IDaoCity;
 import fr.afcepf.atod.wine.data.product.api.IDaoProduct;
 import fr.afcepf.atod.wine.data.product.api.IDaoProductType;
-import fr.afcepf.atod.wine.data.product.impl.DaoCity;
 import fr.afcepf.atod.wine.data.product.impl.DaoProductType;
-import fr.afcepf.atod.wine.entity.City;
 import fr.afcepf.atod.wine.entity.Product;
 import fr.afcepf.atod.wine.entity.ProductType;
 import fr.afcepf.atod.wine.entity.ProductVarietal;
