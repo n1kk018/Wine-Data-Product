@@ -85,6 +85,9 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
     private static final String REQTYPE = "SELECT DISTINCT p FROM ProductWine p "
             + "WHERE p.productType.type = :paramType";
     
+    private static final String REQIDZ = "SELECT DISTINCT p FROM ProductWine p "
+            + "WHERE p.id IN (:paramIdz)";
+    
 
     /*********************************************
      * Requetes HQL
@@ -513,4 +516,22 @@ public class DaoProduct extends DaoGeneric<Product, Integer> implements IDaoProd
 	public Integer countByAppellation(ProductType type, Object o) {
 		return null;
 	}
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Product> findByIdzList(List<Integer> paramIdz, Integer paramFirstRow, Integer paramRowsPerPage,
+            String paramSorting_field, String paramSorting_dir) throws WineException {
+        List<Product> listWine = null;
+        listWine = getSf().getCurrentSession()
+                .createQuery(REQIDZ+" ORDER BY p."+paramSorting_field+" "+paramSorting_dir)
+                .setParameterList("paramIdz", paramIdz)
+                .setFirstResult(paramFirstRow)
+                .setMaxResults(paramRowsPerPage)
+                .list();
+        if(listWine.isEmpty()) {
+            throw new WineException(WineErrorCode.RECHERCHE_NON_PRESENTE_EN_BASE,
+                    "Pas de référence correspondant en bdd");
+        }
+        return listWine;
+    }
 }

@@ -112,6 +112,8 @@ public interface IDaoProduct extends IDaoGeneric<Product, Integer> {
     List<Product> findByAppelationAndType(ProductType type, String appellation,Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
     
     List<Product> findByType(ProductType type, Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
+    
+    List<Product> findByIdzList(List<Integer> idz, Integer firstRow,Integer rowsPerPage, String sorting_field, String sorting_dir) throws WineException;
     /**
      * 
      * @param type
